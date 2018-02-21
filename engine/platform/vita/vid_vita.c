@@ -21,8 +21,6 @@ GNU General Public License for more details.
 #include "input.h"
 #include "gl_vidnt.h"
 
-#define MAX_VGL_ARRAYSIZE 60000
-
 uint16_t *gl_vgl_indices = NULL;
 float *gl_vgl_verts = NULL;
 float *gl_vgl_texcoords = NULL;
@@ -346,8 +344,8 @@ qboolean R_Init_OpenGL( void )
 	VID_StartupGamma();
 	MsgDev( D_NOTE, "R_Init_OpenGL()\n");
 
-	gl_vgl_indices = malloc( sizeof( GLshort ) * MAX_VGL_ARRAYSIZE );
-	for( int i = 0; i < MAX_VGL_ARRAYSIZE; ++i ) gl_vgl_indices[i] = i;
+	gl_vgl_indices = malloc( sizeof( uint16_t ) * MAX_VGL_ARRAYSIZE );
+	for( uint16_t i = 0; i < MAX_VGL_ARRAYSIZE; ++i ) gl_vgl_indices[i] = i;
 
 	gl_vgl_verts = calloc( MAX_VGL_ARRAYSIZE * 3, sizeof( GLfloat ) );
 	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );

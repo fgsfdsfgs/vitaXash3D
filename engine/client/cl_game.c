@@ -3294,6 +3294,9 @@ void GAME_EXPORT TriFog( float flFogColor[3], float flStart, float flEnd, int bO
 	if( RI.fogEnabled ) return;
 	RI.fogCustom = true;
 
+#ifdef __vita__
+	return; // FIXME: add fog later
+#endif
 	if( !bOn )
 	{
 		pglDisable( GL_FOG );
@@ -3377,6 +3380,13 @@ Heavy legacy of Quake...
 */
 void GAME_EXPORT TriColor4fRendermode( float r, float g, float b, float a, int rendermode )
 {
+#ifdef __vita__
+	if( rendermode == kRenderTransAlpha )
+		{ *(tri_colorp++) = r; *(tri_colorp++) = g; *(tri_colorp++) = b; *(tri_colorp++) = a; }
+	else
+		{ *(tri_colorp++) = r*a; *(tri_colorp++) = g*a; *(tri_colorp++) = b*a; *(tri_colorp++) = 1.f; }
+	if( tri_mode ) return;
+#endif
 	if( rendermode == kRenderTransAlpha )
 		pglColor4f( r, g, b, a );
 	else pglColor4f( r * a, g * a, b * a, 1.0f );

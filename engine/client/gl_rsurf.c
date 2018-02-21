@@ -1163,10 +1163,9 @@ void R_RenderBrushPoly( msurface_t *fa )
 	t = R_TextureAnimation( fa->texinfo->texture, fa - RI.currententity->model->surfaces );
 
 #ifdef __vita__ // FIXME
-	if( 0 )
+	GL_Bind( XASH_TEXTURE0, t->gl_texturenum );
 #else
 	if( RP_NORMALPASS() && fa->flags & SURF_REFLECT )
-#endif
 	{
 		if( SURF_INFO( fa, RI.currentmodel )->mirrortexturenum )
 		{
@@ -1187,6 +1186,7 @@ void R_RenderBrushPoly( msurface_t *fa )
 		SURF_INFO( fa, RI.currentmodel )->mirrortexturenum = 0;
 	}
 	else GL_Bind( XASH_TEXTURE0, t->gl_texturenum );
+#endif
 
 	if( fa->flags & SURF_DRAWTURB )
 	{	

@@ -2390,6 +2390,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	pglDisableClientState( GL_COLOR_ARRAY );
+	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices ); // HACK: restore index pointer
 }
 
 /*
@@ -3253,9 +3254,6 @@ void R_StudioRenderModel( void )
 	{
 		R_StudioRenderFinal( );
 	}
-#ifdef __vita__
-	vglIndexPointer( GL_SHORT, 0, 60000, gl_vgl_indices ); // HACK: restore index pointer
-#endif
 }
 
 /*

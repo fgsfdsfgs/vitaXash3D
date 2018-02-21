@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include <vitaGL.h>
 #include "../platform/vita/gl_stubs.h"
 #include "../platform/vita/gl_mangle.h"
+#define MAX_VGL_ARRAYSIZE 32000
 extern void vitaBeginFrame( void );
 extern void vitaEndFrame( void );
 extern float *gl_vgl_verts;
