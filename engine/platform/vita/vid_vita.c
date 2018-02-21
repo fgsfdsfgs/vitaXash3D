@@ -130,7 +130,7 @@ void GL_InitExtensions( void )
 	GL_SetExtension( GL_ENV_COMBINE_EXT, false );
 	GL_SetExtension( GL_DOT3_ARB_EXT, false );
 	GL_SetExtension( GL_TEXTURE_3D_EXT, false );
-	GL_SetExtension( GL_SGIS_MIPMAPS_EXT, false );
+	GL_SetExtension( GL_SGIS_MIPMAPS_EXT, true ); // use glGenerateMipmaps
 
 	// SCE_GXM_MAX_TEXTURE_UNITS is 16, but 4 is enough
 	//GL_SetExtension( GL_ARB_MULTITEXTURE, true ); // TODO: make this shit work
