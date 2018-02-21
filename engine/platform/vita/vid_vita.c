@@ -34,26 +34,15 @@ typedef enum
 	rserr_unknown
 } rserr_t;
 
-// workaround in case this is called multiple times
-static qboolean vgl_rendering = false;
-
 void vitaBeginFrame( void )
 {
-	if( !vgl_rendering )
-	{
-		vglStartRendering( );
-		vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices );
-		vgl_rendering = true;
-	}
+	vglStartRendering( );
+	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices );
 }
 
 void vitaEndFrame( void )
 {
-	if( vgl_rendering )
-	{
-		vglStopRendering( );
-		vgl_rendering = false;
-	}
+	vglStopRendering( );
 }
 
 /*

@@ -417,7 +417,7 @@ void DLLEXPORT IN_ClearStates( void );
 void DLLEXPORT IN_ActivateMouse_CL( void );
 void DLLEXPORT IN_DeactivateMouse_CL( void );
 void DLLEXPORT IN_Accumulate( void );
-void DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams );
+void DLLEXPORT V_CalcRefdef_CL( struct ref_params_s *pparams );
 
 typedef struct dllexport_s
 {
@@ -461,7 +461,7 @@ dllexport_t vita_client_exports[] = {
 	{ "IN_MouseEvent", (void*)IN_MouseEvent_CL },
 	{ "IN_Accumulate", (void*)IN_Accumulate },
 	{ "IN_ClearStates", (void*)IN_ClearStates },
-	{ "V_CalcRefdef", (void*)V_CalcRefdef },
+	{ "V_CalcRefdef", (void*)V_CalcRefdef_CL },
 	{ "KB_Find", (void*)KB_Find },
 	{ "HUD_GetStudioModelInterface", (void*)HUD_GetStudioModelInterface },
 	{ "HUD_DirectorMessage", (void*)HUD_DirectorMessage },

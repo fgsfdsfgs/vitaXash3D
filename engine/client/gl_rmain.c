@@ -1325,10 +1325,10 @@ void R_RenderFrame( const ref_params_t *fd, qboolean drawWorld )
 	RI.viewport[2] = fd->viewport[2];
 	RI.viewport[3] = fd->viewport[3];
 
-#ifndef __vita__
 	if( gl_finish->integer && drawWorld )
 		pglFinish();
 
+#ifndef __vita__
 	if( gl_allow_mirrors->integer )
 	{
 		// render mirrors
