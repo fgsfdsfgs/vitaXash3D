@@ -45,20 +45,12 @@ static buttonmapping_t btnmap[12] = {
 	{ SCE_CTRL_SQUARE, K_SPACE },
 };
 
-static void RescaleAnalog( int *x, int *y, int dead )
+static void RadialDeadzone( int *x, int *y, int dead )
 {
 	float analogX = (float) *x;
 	float analogY = (float) *y;
-	float deadZone = (float) dead;
-	float maximum = 128.0f;
 	float magnitude = sqrt( analogX * analogX + analogY * analogY );
-	if( magnitude >= deadZone )
-	{
-		float scalingFactor = maximum / magnitude * (magnitude - deadZone) / (maximum - deadZone);
-		*x = (int) (analogX * scalingFactor);
-		*y = (int) (analogY * scalingFactor);
-	}
-	else
+	if( magnitude <= dead )
 	{
 		*x = 0;
 		*y = 0;
@@ -72,22 +64,14 @@ static inline void UpdateAxes( void )
 	int right_x = pad.rx - 127;
 	int right_y = pad.ry - 127;
 
-	if( abs( left_x ) < vita_deadzone_l )
-		left_x = 0;
-	else
-		Joy_AxisMotionEvent( 0, 0, left_x * 256 );
+	if( abs( left_x ) < vita_deadzone_l ) left_x = 0;
+	if( abs( left_y ) < vita_deadzone_l ) left_y = 0;
+	RadialDeadzone( &right_x, &right_y, vita_deadzone_r );
 
-	if( abs( left_y ) < vita_deadzone_l )
-		left_y = 0;
-	else
-		Joy_AxisMotionEvent( 0, 1, left_y * 256 );
-
-	if( right_x || right_y )
-	{
-		RescaleAnalog( &right_x, &right_y, vita_deadzone_r );
-		if( right_x ) Joy_AxisMotionEvent( 0, 2, right_x * 256 );
-		if( right_y ) Joy_AxisMotionEvent( 0, 3, right_y * 256 );
-	}
+	Joy_AxisMotionEvent( 0, 0, left_x * 255 );
+	Joy_AxisMotionEvent( 0, 1, left_y * 255 );
+	Joy_AxisMotionEvent( 0, 2, right_x * -255 );
+	Joy_AxisMotionEvent( 0, 3, right_y * -255 );
 }
 
 static inline void UpdateButtons( void )
