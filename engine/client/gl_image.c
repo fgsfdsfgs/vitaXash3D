@@ -256,6 +256,10 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 	}
 	else if( tex->flags & ( TF_BORDER|TF_ALPHA_BORDER ))
 	{
+#ifdef __vita__
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+#else
 		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
 
 		if( tex->target != GL_TEXTURE_1D )
@@ -268,6 +272,7 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, zeroClampBorder );
 		else if( tex->flags & TF_ALPHA_BORDER )
 			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, alphaZeroClampBorder );
+#endif
 	}
 	else
 	{
@@ -1005,9 +1010,9 @@ void GL_GenerateMipmaps( byte *buffer, rgbdata_t *pic, gltexture_t *tex, GLenum 
 
 #ifdef __vita__
 	if( tex->height == 1 ) return; // HACK: don't generate mips for GL_TEXTURE_1D
-	if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST ) ) )
+	if( !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST ) ) )
 	{
-		if( glTarget == GL_TEXTURE_1D ) glTarget = GL_TEXTURE_2D;
+		if( glTarget == GL_TEXTURE_1D || glTarget == GL_TEXTURE_3D ) glTarget = GL_TEXTURE_2D;
 		pglGenerateMipmap( glTarget );
 		GLenum err = pglGetError();
 		if( err ) MsgDev( D_WARN, "GL_GenerateMipmaps( %s ): gl error 0x%x\n", tex->name, err );
@@ -1234,7 +1239,11 @@ static void GL_UploadTextureDXT( rgbdata_t *pic, gltexture_t *tex, qboolean subI
 	else if( tex->flags & TF_TEXTURE_3D )
 	{
 		// determine target
+#ifdef __vita__
+		tex->target = glTarget = GL_TEXTURE_2D; // HACK
+#else
 		tex->target = glTarget = GL_TEXTURE_3D;
+#endif
 	}
 
 	pglBindTexture( tex->target, tex->texnum );
@@ -1419,7 +1428,11 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	else if( tex->flags & TF_TEXTURE_3D )
 	{
 		// determine target
+#ifdef __vita__
+		tex->target = glTarget = GL_TEXTURE_2D; // HACK
+#else
 		tex->target = glTarget = GL_TEXTURE_3D;
+#endif
 	}
 
 	pglBindTexture( tex->target, tex->texnum );
