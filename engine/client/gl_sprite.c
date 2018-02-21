@@ -874,7 +874,7 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 	VectorMA( point, frame->left * scale, v_right, verts[1] );
 	VectorMA( org, frame->up * scale, v_up, point );
 	VectorMA( point, frame->right * scale, v_right, verts[2] );
-	VectorMA( org, frame->up * scale, v_up, point );
+	VectorMA( org, frame->down * scale, v_up, point );
 	VectorMA( point, frame->right * scale, v_right, verts[3] );
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
