@@ -1030,10 +1030,6 @@ void GL_GenerateMipmaps( byte *buffer, rgbdata_t *pic, gltexture_t *tex, GLenum 
 	w = tex->width;
 	h = tex->height;
 
-#ifdef __vita__
-	GLenum oldFormat = tex->format;
-	tex->format = 4;
-#endif
 	// software mipmap generator
 	while( w > 1 || h > 1 )
 	{
@@ -1049,9 +1045,6 @@ void GL_GenerateMipmaps( byte *buffer, rgbdata_t *pic, gltexture_t *tex, GLenum 
 		else pglTexImage2D( tex->target + side, mipLevel, tex->format, w, h, 0, inFormat, dataType, buffer );
 		if( pglGetError( )) break; // can't create mip levels
 	}
-#ifdef __vita__
-	tex->format = oldFormat;
-#endif
 }
 
 /*
@@ -1361,18 +1354,17 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	if( pic->flags & IMAGE_HAS_ALPHA )
 		tex->flags |= TF_HAS_ALPHA;
 
+#ifdef __vita__
+	// apparently xash forces all textures to RGBA anyway
+	outFormat = GL_RGBA;
+	inFormat = GL_RGBA;
+#else
 	// determine format
 	inFormat = PFDesc[pic->type].glFormat;
 	outFormat = GL_TextureFormat( tex, &samples );
+#endif
 
 	tex->format = outFormat;
-
-#ifdef __vita__
-	outFormat = samples;
-	if( inFormat == GL_LUMINANCE8 ) inFormat = GL_LUMINANCE;
-	else if( inFormat == GL_LUMINANCE8_ALPHA8 ) inFormat = GL_LUMINANCE_ALPHA;
-	else if( inFormat == GL_INTENSITY8 ) inFormat = GL_INTENSITY;
-#endif
 
 	MsgDev( D_NOTE, "GL_UploadTexture: uploading %s [%d x %d] orig [%d x %d] inf 0x%x outf 0x%x old outf 0x%x\n", tex->name, tex->width, tex->height, tex->srcWidth, tex->srcHeight, inFormat, outFormat, tex->format );
 
@@ -1383,8 +1375,10 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	if( tex->flags & TF_FLOATDATA )
 		dataType = GL_FLOAT;
 
+#ifndef __vita__
 	if( tex->flags & TF_DEPTHMAP )
 		inFormat = GL_DEPTH_COMPONENT;
+#endif
 
 	if( pic->flags & IMAGE_CUBEMAP )
 	{
