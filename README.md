@@ -14,8 +14,10 @@ You can create issues for anything that is not listed here.
   * skybox textures render as the "missing texture" texture;
   * dynamic lights cause artifacts in lightmaps, esp. if the dlight hits a transparent surface;
   * model lighting is somewhat broken: there's no normals or glShadeModel;
+  * if the engine fails to load a texture for a decal or sprite it will infinitely retry loading it, lagging the game to hell;
+  * some translucent textures render as opaque;
   * translucent HUD elements have "holes" in places with high color intensity;
-  * particles, tracers and some beams don't render at all or (in case of some tracers) point towards origin;
+  * some particles and tracers don't render at all or (in case of MP5 tracers) point towards origin;
   * func_breakable gibs either don't render or don't spawn at all (HLSDK related?);
   * guns produce no bullet impact decals, sparks, brass or tracers (HLSDK related?);
   * BMP menu elements (`gfx/shell/btns_main.bmp` & co in WON HL's `pak0.pak` or in the unpatched `extras.pak`) don't render at all, so they're disabled for now;
@@ -30,9 +32,8 @@ You can create issues for anything that is not listed here.
   * no way to input text in the console;
   * no touch controls for anything.
 * Game:
-  * saving/loading is somewhat broken (hopefully fixed now? Needs testing);
+  * saving/loading and map transitions via changelevel need extensive testing;
   * cl_lw breaks a lot of weapons, so keep it disabled for now;
-  * if you have a weapon out during mapchange, game crashes in HLSDK weapons/HUD code (depends on CLIENT_WEAPONS and/or cl_lw?);
   * func_pushables slide endlessly after you push them as if there's no friction;
   * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
 * Misc:
