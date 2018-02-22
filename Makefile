@@ -28,7 +28,7 @@ OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)
 PREFIX    = arm-vita-eabi
 CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
-CFLAGS    = -g3 -O2 -Wl,-q -Wfatal-errors -fsigned-char -fno-lto \
+CFLAGS    = -g -O2 -Wl,-q -Wfatal-errors -fsigned-char -fno-lto \
             $(INCLUDES) \
             -DXASH_STATIC -DXASH_SINGLE_BINARY
 
