@@ -834,7 +834,7 @@ void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, vec3_t pos
 
 	if( textureIndex <= 0 || textureIndex >= MAX_TEXTURES )
 	{
-		MsgDev( D_ERROR, "Decal has invalid texture!\n" );
+		MsgDev( D_ERROR, "Decal has invalid texture: %d!\n", textureIndex );
 		return;
 	}
 
@@ -968,27 +968,28 @@ void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 
 	GL_Bind( XASH_TEXTURE0, pDecal->texture );
 
-#ifndef __vita__
+#ifdef __vita__
+	float *vp = gl_vgl_verts;
+	float *tp = gl_vgl_texcoords;
+	for( i = 0; i < numVerts; i++, v += VERTEXSIZE )
+	{
+		*(tp++) = v[3]; *(tp++) = v[4];
+		*(vp++) = v[0]; *(vp++) = v[1]; *(vp++) = v[2];
+	}
+	pglEnableClientState( GL_VERTEX_ARRAY );
+	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	vglVertexPointer( 3, GL_FLOAT, 0, numVerts, gl_vgl_verts );
+	vglTexCoordPointer( 2, GL_FLOAT, 0, numVerts,  gl_vgl_texcoords );
+	vglDrawObjects( GL_TRIANGLE_FAN, numVerts, GL_TRUE );
+	pglDisableClientState( GL_VERTEX_ARRAY );
+	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+#else
 	pglBegin( GL_POLYGON );
-#endif
-
-#ifndef __vita__
 	for( i = 0; i < numVerts; i++, v += VERTEXSIZE )
 	{
 		pglTexCoord2f( v[3], v[4] );
 		pglVertex3fv( v );
 	}
-#endif
-
-#ifdef __vita__
-	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, VERTEXSIZE, numVerts, v );
-	vglTexCoordPointer( 2, GL_FLOAT, VERTEXSIZE, numVerts, v + 3 );
-	vglDrawObjects( GL_TRIANGLE_FAN, numVerts, GL_TRUE );
-	pglDisableClientState( GL_VERTEX_ARRAY );
-	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-#else
 	pglEnd();
 #endif
 }
