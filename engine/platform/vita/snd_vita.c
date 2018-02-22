@@ -21,8 +21,8 @@ GNU General Public License for more details.
 #define u64 uint64_t
 #define u8 uint8_t
 
-#define SAMPLE_RATE   48000
-#define AUDIOSIZE   16384
+#define SAMPLE_RATE 48000
+#define AUDIOSIZE 0x8000
 
 extern convar_t *s_primary;
 extern dma_t dma;
@@ -37,8 +37,8 @@ static float tickRate;
 
 static int audio_thread( int args, void *argp )
 {
-	chn = sceAudioOutOpenPort( SCE_AUDIO_OUT_PORT_TYPE_MAIN, AUDIOSIZE / 2, SAMPLE_RATE, SCE_AUDIO_OUT_MODE_MONO );
-	sceAudioOutSetConfig(chn, -1, -1, -1);
+	chn = sceAudioOutOpenPort( SCE_AUDIO_OUT_PORT_TYPE_MAIN, AUDIOSIZE / 4, SAMPLE_RATE, SCE_AUDIO_OUT_MODE_STEREO );
+	sceAudioOutSetConfig( chn, -1, -1, -1 );
 	int vol[] = { 32767, 32767 };
 	sceAudioOutSetVolume( chn, SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH, vol );
 
@@ -62,8 +62,8 @@ qboolean SNDDMA_Init( void *hInst )
 	shm = &dma;
 	shm->format.width = 2;
 	shm->format.speed = SAMPLE_RATE;
-	shm->format.channels = 1;
-	shm->samples = AUDIOSIZE / shm->format.width;
+	shm->format.channels = 2;
+	shm->samples = AUDIOSIZE / 2;
 	shm->samplepos = 0;
 	shm->buffer = audiobuffer;
 	shm->sampleframes = shm->samples / shm->format.channels;
@@ -95,7 +95,7 @@ int SNDDMA_GetDMAPos(void)
 	sceRtcGetCurrentTick(&tick);
 	const unsigned int deltaTick  = tick.tick - initial_tick.tick;
 	const float deltaSecond = deltaTick * tickRate;
-	u64 samplepos = deltaSecond * SAMPLE_RATE;
+	u64 samplepos = deltaSecond * SAMPLE_RATE * 2;
 	shm->samplepos = samplepos;
 	return samplepos;
 }

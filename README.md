@@ -21,7 +21,7 @@ You can create issues for anything that is not listed here.
   * BMP menu elements (`gfx/shell/btns_main.bmp` & co in WON HL's `pak0.pak` or in the unpatched `extras.pak`) don't render at all, so they're disabled for now;
   * rendering is slow, especially for models.
 * Sound:
-  * there's no sound, I haven't even started working on it yet.
+  * the internal mixer uses 44KHz sample rate, while snd_vita uses 48KHz, making sound a bit too high pitched.
 * Input:
   * Vita buttons map to keyboard keys, analog sticks are actually handled like joysticks;
   * button->key and joystick axis mappings are hardcoded;
