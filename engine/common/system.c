@@ -109,12 +109,9 @@ double GAME_EXPORT Sys_DoubleTime( void )
 
 double GAME_EXPORT Sys_DoubleTime( void )
 {
-	static uint64_t	base;
-
-	uint64_t time = sceKernelGetProcessTimeWide();
-	if (!base) base = time;
-
-	return (double)(time - base) * 0.000001;
+	static SceRtcTick ticks;
+	sceRtcGetCurrentTick( &ticks );
+	return ticks.tick * 0.000001;
 }
 #endif
 
