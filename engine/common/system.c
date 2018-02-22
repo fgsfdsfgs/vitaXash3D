@@ -228,7 +228,7 @@ void Sys_Sleep( unsigned int msec )
 #elif XASH_TIMER == TIMER_LINUX
 	usleep( msec * 1000 );
 #elif XASH_TIMER == TIMER_VITA
-	sceKernelDelayThread( msec * 1000 );
+	//sceKernelDelayThread( msec * 1000 );
 #endif
 }
 
