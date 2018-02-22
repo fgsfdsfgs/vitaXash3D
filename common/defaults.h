@@ -75,6 +75,7 @@ SETUP BACKENDS DEFINATIONS
 
 	#if defined __vita__ && !defined XASH_SDL
 		#define NO_LIBDL
+		#define XASH_ALLOW_SAVERESTORE_OFFSETS
 
 		#ifndef XASH_VIDEO
 			#define XASH_VIDEO VIDEO_VITA

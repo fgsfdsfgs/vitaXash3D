@@ -30,9 +30,7 @@ You can create issues for anything that is not listed here.
   * no way to input text in the console;
   * no touch controls for anything.
 * Game:
-  * saving/loading is somewhat broken;
-  * as a result of the above, after transitioning a map once and then trying to transition to it again, the game crashes because the .hl* file for the map is broken;
-  * guard on c1a0 (end of tram ride) never starts walking to the door for some reason (no errors in console);
+  * saving/loading is somewhat broken (hopefully fixed now? Needs testing);
   * cl_lw breaks a lot of weapons, so keep it disabled for now;
   * if you have a weapon out during mapchange, game crashes in HLSDK weapons/HUD code (depends on CLIENT_WEAPONS and/or cl_lw?);
   * func_pushables slide endlessly after you push them as if there's no friction;
