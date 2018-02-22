@@ -51,7 +51,7 @@ char *Com_OffsetNameForFunction( void *function )
 {
 	static string sname;
 	Q_snprintf( sname, MAX_STRING, "ofs:%d", (int)(void*)(function - (void*)svgame.dllFuncs.pfnGameInit) );
-	MsgDev( D_NOTE, "Com_OffsetNameForFunction %s\n", sname );
+	// MsgDev( D_NOTE, "Com_OffsetNameForFunction %s\n", sname );
 	return sname;
 }
 #endif
