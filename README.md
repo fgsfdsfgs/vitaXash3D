@@ -15,12 +15,13 @@ You can create issues for anything that is not listed here.
   * dynamic lights cause artifacts in lightmaps, esp. if the dlight hits a transparent surface;
   * model lighting is somewhat broken: there's no normals or glShadeModel;
   * translucent HUD elements have "holes" in places with high color intensity;
-  * particles, tracers and some beams don't render at all;
+  * particles, tracers and some beams don't render at all or (in case of some tracers) point towards origin;
+  * func_breakable gibs either don't render or don't spawn at all (HLSDK related?);
   * guns produce no bullet impact decals, sparks, brass or tracers (HLSDK related?);
-  * NPC mouth animation doesn't work (probably because there's no sound);
   * BMP menu elements (`gfx/shell/btns_main.bmp` & co in WON HL's `pak0.pak` or in the unpatched `extras.pak`) don't render at all, so they're disabled for now;
   * rendering is slow, especially for models.
 * Sound:
+  * cracking and other shit happens whenever the game hangs/loads something;
   * the internal mixer uses 44KHz sample rate, while snd_vita uses 48KHz, making sound a bit too high pitched.
 * Input:
   * Vita buttons map to keyboard keys, analog sticks are actually handled like joysticks;
@@ -29,8 +30,11 @@ You can create issues for anything that is not listed here.
   * no way to input text in the console;
   * no touch controls for anything.
 * Game:
+  * saving/loading is somewhat broken;
+  * as a result of the above, after transitioning a map once and then trying to transition to it again, the game crashes because the .hl* file for the map is broken;
+  * guard on c1a0 (end of tram ride) never starts walking to the door for some reason (no errors in console);
   * cl_lw breaks a lot of weapons, so keep it disabled for now;
-  * sometimes the game crashes on mapchange in cl_dll weapons/HUD code (depends on CLIENT_WEAPONS and/or cl_lw?);
+  * if you have a weapon out during mapchange, game crashes in HLSDK weapons/HUD code (depends on CLIENT_WEAPONS and/or cl_lw?);
   * func_pushables slide endlessly after you push them as if there's no friction;
   * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
 * Misc:

@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #define u8 uint8_t
 
 #define SAMPLE_RATE 48000
-#define AUDIOSIZE 0x8000
+#define AUDIOSIZE 16384
 
 extern convar_t *s_primary;
 extern dma_t dma;
