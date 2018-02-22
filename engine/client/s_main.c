@@ -1813,7 +1813,7 @@ qboolean S_Init( void )
 		MsgDev( D_ERROR, "Audio: SDL: %s \n", SDL_GetError() );
 		return false;
 	}
-#elif !defined(XASH_OPENSL)
+#elif !defined(XASH_OPENSL) && !defined(__vita__)
 	return false;
 #endif
 

@@ -14,6 +14,9 @@ GNU General Public License for more details.
 */
 
 #include "common.h"
+
+#if XASH_INPUT == INPUT_VITA
+
 #include "input.h"
 #include "joyinput.h"
 #include "touch.h"
@@ -108,3 +111,5 @@ void Vita_IN_Frame( void )
 	UpdateButtons( );
 	UpdateAxes( );
 }
+
+#endif // INPUT_VITA

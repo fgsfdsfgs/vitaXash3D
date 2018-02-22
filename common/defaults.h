@@ -85,11 +85,11 @@ SETUP BACKENDS DEFINATIONS
 		#endif
 
 		#ifndef XASH_INPUT
-			#define XASH_INPUT INPUT_NULL
+			#define XASH_INPUT INPUT_VITA
 		#endif
 
 		#ifndef XASH_SOUND
-			#define XASH_SOUND SOUND_NULL
+			#define XASH_SOUND SOUND_VITA
 		#endif
 	#endif
 
