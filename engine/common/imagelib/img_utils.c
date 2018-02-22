@@ -1234,7 +1234,6 @@ byte *Image_CreateLumaInternal( byte *fin, int width, int height, int type, int 
 			if( fin[i*4+0] < 32 ) fin[i*4+0] = 0;
 			if( fin[i*4+1] < 32 ) fin[i*4+1] = 0;
 			if( fin[i*4+2] < 32 ) fin[i*4+2] = 0;
-			fin[i*4+3] = 255; // will this do?
 		}
 		return (byte *)fin;
 	default:
