@@ -235,6 +235,10 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 	{
 		if( GL_Support( GL_CLAMPTOEDGE_EXT ))
 		{
+#ifdef __vita__
+//		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+//		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+#else
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 
 			if( tex->target != GL_TEXTURE_1D )
@@ -242,6 +246,7 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 
 			if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 				pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+#endif
 		}
 		else
 		{
@@ -257,8 +262,8 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 	else if( tex->flags & ( TF_BORDER|TF_ALPHA_BORDER ))
 	{
 #ifdef __vita__
-		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+//		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+//		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 #else
 		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
 
