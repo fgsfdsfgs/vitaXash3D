@@ -2,7 +2,7 @@
 A port of Xash3D-FWGS to the PSVita.
 
 ## Warning
-This is currently very broken and not user-friendly at all. Except severe graphics glitches, crashes and gameplay oddities.
+This is currently very broken and not user-friendly at all. Expect severe graphics glitches, crashes and gameplay oddities.
 
 HLSDK is statically linked into the engine executable, so you can only use this with Half-Life right now.
 
