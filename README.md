@@ -18,7 +18,7 @@ You can create issues for anything that is not listed here.
   * particles, tracers and some beams don't render at all;
   * guns produce no bullet impact decals, sparks, brass or tracers (HLSDK related?);
   * NPC mouth animation doesn't work (probably because there's no sound);
-  * menu buttons supplied with WON HL or in the original Xash extras.pak don't render at all, so I had to delete `btns_main.bmp` from `extras.pak` to force Xash to switch to text buttons;
+  * BMP menu elements (`gfx/shell/btns_main.bmp` & co in WON HL's `pak0.pak` or in the unpatched `extras.pak`) don't render at all, so they're disabled for now;
   * rendering is slow, especially for models.
 * Sound:
   * there's no sound, I haven't even started working on it yet.
