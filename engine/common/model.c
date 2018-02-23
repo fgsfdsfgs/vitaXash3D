@@ -2305,19 +2305,18 @@ static void Mod_LoadEntities( const dlump_t *l )
 				while( path && *path )
 				{
 					char *end = Q_strchr( path, ';' );
-					// if( !end )
-					// 	end = path + Q_strlen( path );
-					if( !end )
+					if( !end ) // last wad
 					{
-						// if specified only once wad
-						if( !wadlist.count )
-							FS_FileBase( path, wadlist.wadnames[wadlist.count++] );
+						FS_FileBase( path, wadlist.wadnames[wadlist.count++] );
 						break;
 					}
+
 					Q_strncpy( wadpath, path, (end - path) + 1 );
+
 					FS_FileBase( wadpath, wadlist.wadnames[wadlist.count++] );
 					path += (end - path) + 1; // move pointer
-					if( wadlist.count >= 256 ) break; // too many wads...
+					if( wadlist.count >= 256 )
+						break; // too many wads...
 				}
 			}
 			else if( !Q_stricmp( keyname, "mapversion" ))
