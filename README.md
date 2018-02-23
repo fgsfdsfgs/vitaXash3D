@@ -57,4 +57,5 @@ Run `make` in this directory. This should produce a VPK.
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS;
 - Vita SDK Team for the Vita SDK;
-- Rinnegatamante for vitaGL, vitaQuake/vitaQuakeII and general advice.
+- Rinnegatamante for vitaGL, vitaQuake/vitaQuakeII and general advice;
+- ArkSource for the Live Area stuff.
