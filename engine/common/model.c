@@ -2262,7 +2262,7 @@ static void Mod_LoadEntities( const dlump_t *l )
 {
 	char	*pfile;
 	string	keyname;
-	char	token[2048];
+	char	token[4096];
 
 	// make sure what we really has terminator
 	loadmodel->entities = Mem_Alloc( loadmodel->mempool, l->filelen + 1 );
@@ -2305,8 +2305,8 @@ static void Mod_LoadEntities( const dlump_t *l )
 				while( path && *path )
 				{
 					char *end = Q_strchr( path, ';' );
-					if( !end )
-						end = path + Q_strlen( path );
+					// if( !end )
+					// 	end = path + Q_strlen( path );
 					if( !end )
 					{
 						// if specified only once wad
