@@ -661,12 +661,19 @@ Called from cl_main.c after generating command in client
 */
 void IN_EngineAppendMove( float frametime, usercmd_t *cmd, qboolean active )
 {
-	float forward = 0, side = 0, dpitch = 0, dyaw = 0;
-	if(clgame.dllFuncs.pfnLookEvent)
+	float forward, side, dpitch, dyaw;
+
+	if( clgame.dllFuncs.pfnLookEvent )
 		return;
+
+	if( cls.key_dest != key_game || cl.refdef.paused || cl.refdef.intermission )
+		return;
+
+	forward = side = dpitch = dyaw = 0;
+
 	if(active)
 	{
-		float sensitivity = ((float)cl.refdef.fov_x / (float)90.0f);
+		float sensitivity = ( (float)cl.refdef.fov_x / (float)90.0f );
 #if XASH_INPUT == INPUT_SDL
 		if( m_enginemouse->integer && !m_ignore->integer )
 		{
@@ -679,7 +686,7 @@ void IN_EngineAppendMove( float frametime, usercmd_t *cmd, qboolean active )
 #ifdef __ANDROID__
 		if( !m_ignore->integer )
 		{
-			float  mouse_x, mouse_y;
+			float mouse_x, mouse_y;
 			Android_MouseMove( &mouse_x, &mouse_y );
 			cl.refdef.cl_viewangles[PITCH] += mouse_y * m_pitch->value * sensitivity;
 			cl.refdef.cl_viewangles[YAW] -= mouse_x * m_yaw->value * sensitivity;
@@ -693,9 +700,8 @@ void IN_EngineAppendMove( float frametime, usercmd_t *cmd, qboolean active )
 		cl.refdef.cl_viewangles[PITCH] += dpitch * sensitivity;
 		cl.refdef.cl_viewangles[PITCH] = bound( -90, cl.refdef.cl_viewangles[PITCH], 90 );
 	}
-
-
 }
+
 /*
 ==================
 Host_InputFrame
