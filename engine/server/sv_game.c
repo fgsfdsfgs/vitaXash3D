@@ -2781,7 +2781,7 @@ void GAME_EXPORT pfnWriteString( const char *src )
 	// prepare string to sending
 	dst = string;
 
-	while( 1 )
+	while( src )
 	{
 		// some escaped chars parsed as two symbols - merge it here
 		if( src[0] == '\\' && src[1] == 'n' )
