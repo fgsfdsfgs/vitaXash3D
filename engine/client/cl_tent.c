@@ -1724,6 +1724,11 @@ void GAME_EXPORT CL_FireField( float *org, int radius, int modelIndex, int count
 			pTemp->entity.curstate.rendermode = kRenderTransTexture;
 			pTemp->entity.curstate.renderamt = 128;
 		}
+		else if ( flags & TEFIRE_FLAG_ADDITIVE )
+		{
+			pTemp->entity.curstate.rendermode = kRenderTransAdd;
+			pTemp->entity.curstate.renderamt = 80;
+		}
 
 		pTemp->die += life;
 	}
@@ -1814,6 +1819,7 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 	int		iSize = BF_ReadByte( msg );
 	int		type, color, count, flags;
 	int		decalIndex, modelIndex, entityIndex;
+	int		iLife;
 	float		scale, life, frameRate, vel, random;
 	float		brightness, r, g, b;
 	vec3_t		pos, pos2, ang;
@@ -2172,7 +2178,7 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		pos[2] = BF_ReadCoord( &buf );
 		scale = (float)(BF_ReadByte( &buf ) * 0.1f);
 		modelIndex = CL_FindModelIndex( "sprites/richo1.spr" );
-		CL_RicochetSprite( pos, Mod_Handle( modelIndex ), 0.0f, scale );
+		CL_RicochetSprite( pos, Mod_Handle( modelIndex ), 0.1f, scale );
 		CL_RicochetSound( pos );
 		break;
 	case TE_PLAYERDECAL:
@@ -2217,9 +2223,9 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		pos2[1] = BF_ReadCoord( &buf );
 		pos2[2] = BF_ReadCoord( &buf );
 		modelIndex = BF_ReadShort( &buf );
-		life = (float)(BF_ReadByte( &buf ) * 0.1f);
+		iLife = BF_ReadByte( &buf );
 		color = BF_ReadByte( &buf );	// playernum
-		CL_Projectile( pos, pos2, modelIndex, life, color, NULL );
+		CL_Projectile( pos, pos2, modelIndex, iLife, color, NULL );
 		break;
 	case TE_PLAYERSPRITES:
 		color = BF_ReadShort( &buf );	// entitynum

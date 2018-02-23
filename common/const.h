@@ -530,7 +530,8 @@
 #define TEFIRE_FLAG_SOMEFLOAT	2 // some of the sprites will drift upwards. (50% chance)
 #define TEFIRE_FLAG_LOOP	4 // if set, sprite plays at 15 fps, otherwise plays at whatever rate stretches the animation over the sprite's duration.
 #define TEFIRE_FLAG_ALPHA	8 // if set, sprite is rendered alpha blended at 50% else, opaque
-#define TEFIRE_FLAG_PLANAR	16 // if set, all fire sprites have same initial Z instead of randomly filling a cube. 
+#define TEFIRE_FLAG_PLANAR	16 // if set, all fire sprites have same initial Z instead of randomly filling a cube.
+#define TEFIRE_FLAG_ADDITIVE	32 // if set, sprite is rendered non-opaque with additive
 
 #define TE_PLAYERATTACHMENT		124	// attaches a TENT to a player (this is a high-priority tent)
 // byte (entity index of player)
