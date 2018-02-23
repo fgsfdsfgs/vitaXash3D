@@ -697,9 +697,11 @@ void Sys_Quit( void )
 {
 	MsgDev( D_INFO, "Shutting down...\n" );
 	Host_Shutdown();
-	if( host.crashed )
-		sceKernelExitDeleteThread( 0 );
+#ifdef __vita__
 	sceKernelExitDeleteThread( 0 );
+#else
+	exit( host.crashed );
+#endif
 }
 
 /*
