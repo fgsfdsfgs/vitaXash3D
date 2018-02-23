@@ -76,7 +76,8 @@ int main( int argc, char **argv )
 	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG );
 
 	sceIoMkdir( "ux0:/data/xash3d", 0775 );
-	sceIoMkdir( "ux0:/data/xash3d/save", 0775 ); // crashes without this dir
+	sceIoMkdir( "ux0:/data/xash3d/valve", 0775 );
+	sceIoMkdir( "ux0:/data/xash3d/valve/save", 0775 ); // crashes without this dir
 
 	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x800000, 0, 0, NULL );
 	if( main_thread >= 0 )
