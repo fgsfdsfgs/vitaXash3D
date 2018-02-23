@@ -61,6 +61,11 @@ void COM_Log( const char *pszFile, const char *fmt, ... )
 	vsprintf( string, fmt, argptr );
 	va_end( argptr );
 
+#ifdef __vita__
+	char realpath[1024];
+	snprintf( realpath, 1024, "ux0:/data/xash3d/%s", pfilename );
+	pfilename = (char*)realpath;
+#endif
 	fp = fopen( pfilename, "a+t");
 	if( fp )
 	{

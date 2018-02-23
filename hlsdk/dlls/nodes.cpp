@@ -1703,7 +1703,13 @@ void CTestHull::BuildNodeGraph( void )
 	}
 
 	// make sure directories have been made
+#ifdef __vita__
+	char tmpgamedir[MAX_PATH];
+	GET_GAME_DIR( tmpgamedir );
+	snprintf( szNrpFilename, MAX_PATH, "%s/%s", "ux0:/data/xash3d", tmpgamedir );
+#else
 	GET_GAME_DIR( szNrpFilename );
+#endif
 	strcat( szNrpFilename, "/maps" );
 	CreateDirectory( szNrpFilename, NULL );
 	strcat( szNrpFilename, "/graphs" );
@@ -2560,7 +2566,13 @@ int CGraph::FSaveGraph( const char *szMapName )
 	}
 
 	// make sure directories have been made
+#ifdef __vita__
+	char tmpgamedir[MAX_PATH];
+	GET_GAME_DIR( tmpgamedir );
+	snprintf( szFilename, MAX_PATH, "%s/%s", "ux0:/data/xash3d", tmpgamedir );
+#else
 	GET_GAME_DIR( szFilename );
+#endif
 	strcat( szFilename, "/maps" );
 	CreateDirectory( szFilename, NULL );
 	strcat( szFilename, "/graphs" );

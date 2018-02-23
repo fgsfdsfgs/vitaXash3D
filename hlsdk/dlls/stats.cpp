@@ -52,7 +52,11 @@ void UpdateStatsFile( float dataTime, const char *pMapname, float health, float 
 {
 	FILE *fp;
 
+#ifdef __vita__
+	fp = fopen( "ux0:/data/xash3d/stats.txt", "a" );
+#else
 	fp = fopen( "stats.txt", "a" );
+#endif
 	if( !fp )
 		return;
 	fprintf( fp, "%6.2f, %6.2f, %6.2f, %s, %2d\n", dataTime, health, ammo, pMapname, skillLevel );
