@@ -66,16 +66,17 @@ int xash_main( unsigned int argc, void *argv );
 
 int main( int argc, char **argv )
 {
-	sceAppUtilInit(&(SceAppUtilInitParam){}, &(SceAppUtilBootParam){});
-	sceCommonDialogSetConfigParam(&(SceCommonDialogConfigParam){});
-	scePowerSetArmClockFrequency(444);
-	scePowerSetBusClockFrequency(222);
-	scePowerSetGpuClockFrequency(222);
-	scePowerSetGpuXbarClockFrequency(166);
-	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-	sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
+	sceAppUtilInit( &(SceAppUtilInitParam){}, &(SceAppUtilBootParam){} );
+	sceCommonDialogSetConfigParam( &(SceCommonDialogConfigParam){} );
+	scePowerSetArmClockFrequency( 444 );
+	scePowerSetBusClockFrequency( 222 );
+	scePowerSetGpuClockFrequency( 222 );
+	scePowerSetGpuXbarClockFrequency( 166 );
+	sceSysmoduleLoadModule( SCE_SYSMODULE_NET );
+	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG );
 
 	sceIoMkdir( "ux0:/data/xash3d", 0775 );
+	sceIoMkdir( "ux0:/data/xash3d/save", 0775 ); // crashes without this dir
 
 	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x800000, 0, 0, NULL );
 	if( main_thread >= 0 )
