@@ -589,7 +589,7 @@ Never called by the game logic, just the system event queing
 */
 qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length )
 {
-	int 		ret;
+	int 		ret = SOCKET_ERROR;
 	struct sockaddr	addr;
 	socklen_t	addr_len;
 	int		net_socket = 0;
