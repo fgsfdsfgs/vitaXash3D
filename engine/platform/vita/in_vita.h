@@ -16,7 +16,10 @@ GNU General Public License for more details.
 #ifndef IN_VITA_H
 #define IN_VITA_H
 
+extern qboolean vita_keyboard_on;
+
 void Vita_IN_Init( void );
 void Vita_IN_Frame( void );
+void Vita_IN_OpenKeyboard( char *target, int target_sz );
 
 #endif // IN_VITA_H

@@ -21,11 +21,24 @@ GNU General Public License for more details.
 #include "joyinput.h"
 #include "touch.h"
 #include "client.h"
+#include "in_vita.h"
 #include <vitasdk.h>
 
 static int vita_deadzone_l = 30;
 static int vita_deadzone_r = 30;
 static SceCtrlData pad, pad_old;
+
+qboolean vita_keyboard_on = false;
+static char input_concmd[128];
+static uint16_t input_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
+static uint16_t initial_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
+static uint16_t input_title[] =
+{
+	'I', 'n', 'p', 'u', 't', ' ',
+	'c', 'o', 'm', 'm', 'a', 'n', 'd', 0
+};
+static char *input_target;
+static int input_target_sz;
 
 typedef struct buttonmapping_s
 {
@@ -33,7 +46,8 @@ typedef struct buttonmapping_s
 	int key;
 } buttonmapping_t;
 
-static buttonmapping_t btnmap[12] = {
+static buttonmapping_t btnmap[12] =
+{
 	{ SCE_CTRL_SELECT, '~' },
 	{ SCE_CTRL_START, K_ESCAPE },
 	{ SCE_CTRL_UP, K_UPARROW },
@@ -48,7 +62,23 @@ static buttonmapping_t btnmap[12] = {
 	{ SCE_CTRL_SQUARE, K_SPACE },
 };
 
-static void RadialDeadzone( int *x, int *y, int dead )
+static inline void ascii2utf( uint16_t *dst, char *src, int dstsize )
+{
+	if( !src || !dst ) return;
+	while( *src && (dstsize-- > 0) )
+		*(dst++) = (*src++);
+	*dst = 0x00;
+}
+
+static inline void utf2ascii( char *dst, uint16_t *src, int dstsize )
+{
+	if( !src || !dst ) return;
+	while( *src && (dstsize-- > 0) )
+		*(dst++) = (*(src++)) & 0xFF;
+	*dst = 0x00;
+}
+
+static inline void RadialDeadzone( int *x, int *y, int dead )
 {
 	float analogX = (float) *x;
 	float analogY = (float) *y;
@@ -93,13 +123,63 @@ static inline void UpdateDPad( void )
 	hat |= pad.down && JOY_HAT_DOWN;
 	Joy_HatMotionEvent( 0, 0, hat );
 */
-	for( int i = 0; i < 12; ++i )
-		if( ( pad.buttons & btnmap[i].btn ) != ( pad_old.buttons & btnmap[i].btn ) )
-			Key_Event( btnmap[i].key, !!( pad.buttons & btnmap[i].btn ) );
+	if( cls.key_dest == key_console && ( pad.buttons & SCE_CTRL_LTRIGGER ) )
+	{
+		Vita_IN_OpenKeyboard( input_concmd, sizeof(input_concmd) );
+	}
+	else
+	{
+		for( int i = 0; i < 12; ++i )
+			if( ( pad.buttons & btnmap[i].btn ) != ( pad_old.buttons & btnmap[i].btn ) )
+				Key_Event( btnmap[i].key, !!( pad.buttons & btnmap[i].btn ) );
+	}
+}
+
+static inline void UpdateKeyboard( void )
+{
+	static SceImeDialogResult result;
+	SceCommonDialogStatus status = sceImeDialogGetStatus( );
+	if( status == 2 )
+	{
+		memset( &result, 0, sizeof(SceImeDialogResult) );
+		sceImeDialogGetResult( &result );
+		if( result.button == SCE_IME_DIALOG_BUTTON_ENTER )
+		{
+			input_target[0] = 0;
+			utf2ascii( input_target, input_text, input_target_sz );
+			if( input_target == input_concmd && input_target[0] )
+				Cbuf_AddText( input_target ), Cbuf_AddText( "\n" );
+		}
+		sceImeDialogTerm( );
+		vita_keyboard_on = false;
+	}
+}
+
+void Vita_IN_OpenKeyboard( char *target, int target_sz )
+{
+	if( vita_keyboard_on ) return;
+	if( !target || target_sz < 2 ) return;
+
+	SceImeDialogParam param;
+	sceImeDialogParamInit( &param );
+	param.supportedLanguages = 0x0001FFFF;
+	param.languagesForced = SCE_TRUE;
+	param.type = SCE_IME_TYPE_BASIC_LATIN;
+	param.title = input_title;
+	param.maxTextLength = target_sz - 1;
+	param.initialText = initial_text;
+	param.inputTextBuffer = input_text;
+
+	input_target = target;
+	input_target_sz = target_sz;
+	vita_keyboard_on = true;
+
+	sceImeDialogInit(&param);
 }
 
 void Vita_IN_Init( void )
 {
+
 }
 
 void Vita_IN_Frame( void )
@@ -107,9 +187,16 @@ void Vita_IN_Frame( void )
 	pad_old = pad;
 	sceKernelPowerTick(0);
 	sceCtrlPeekBufferPositive( 0, &pad, 1 );
-	UpdateDPad( );
-	UpdateButtons( );
-	UpdateAxes( );
+	if( vita_keyboard_on )
+	{
+		UpdateKeyboard( );
+	}
+	else
+	{
+		UpdateDPad( );
+		UpdateButtons( );
+		UpdateAxes( );
+	}
 }
 
 #endif // INPUT_VITA

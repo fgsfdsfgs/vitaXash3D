@@ -34,6 +34,8 @@ typedef enum
 	rserr_unknown
 } rserr_t;
 
+extern qboolean vita_keyboard_on;
+
 void vitaBeginFrame( void )
 {
 	vglStartRendering( );
@@ -42,7 +44,16 @@ void vitaBeginFrame( void )
 
 void vitaEndFrame( void )
 {
-	vglStopRendering( );
+	if( vita_keyboard_on )
+	{
+		vglStopRenderingInit( );
+		vglUpdateCommonDialog( );
+		vglStopRenderingTerm( );
+	}
+	else
+	{
+		vglStopRendering( );
+	}
 }
 
 /*

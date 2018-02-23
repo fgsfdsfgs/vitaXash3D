@@ -28,9 +28,7 @@ You can create issues for anything that is not listed here.
 * Input:
   * Vita buttons map to keyboard keys, analog sticks are actually handled like joysticks;
   * button->key and joystick axis mappings are hardcoded;
-  * deadzones are hardcoded and there's no analog rescaling;
-  * no way to input text in the console;
-  * no touch controls for anything.
+  * deadzones are hardcoded and there's no analog rescaling.
 * Game:
   * saving/loading and map transitions via changelevel need extensive testing;
   * cl_lw breaks a lot of weapons, so keep it disabled for now;
