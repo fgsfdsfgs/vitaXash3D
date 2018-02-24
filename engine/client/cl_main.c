@@ -298,6 +298,96 @@ void CL_UpdateFrameLerp( void )
 }
 
 /*
+====================
+CL_CheckUpdateRate
+
+Check is current cl_updaterate valid
+====================
+*/
+void CL_CheckUpdateRate()
+{
+	const float cl_updaterate_min = 10, cl_updaterate_max = 102;
+
+	if( cl_updaterate->value < cl_updaterate_min )
+	{
+		Cvar_SetFloat( "cl_updaterate", cl_updaterate_min );
+		MsgDev( D_INFO, "cl_updaterate minimum is %f, resetting to default (%f)\n", cl_updaterate_min, cl_updaterate_min );
+	}
+	else if( cl_updaterate->value > cl_updaterate_max )
+	{
+		Cvar_SetFloat( "cl_updaterate", cl_updaterate_max );
+		MsgDev( D_INFO, "cl_updaterate maximum is %f, resetting to maximum (%f)\n", cl_updaterate_max, cl_updaterate_max );
+	}
+}
+
+/*
+====================
+CL_DriftInterpAmount
+
+Smoothly drift lerp_msec
+====================
+*/
+int CL_DriftInterpolationAmount( float interp_sec )
+{
+	static float interpolationAmount = 0.1f;
+
+	if ( interp_sec != interpolationAmount )
+	{
+		float maxmove = host.frametime * 0.05;
+		float diff = interp_sec - interpolationAmount;
+
+		if ( diff > 0 )
+		{
+			if ( diff > maxmove )
+				diff = maxmove;
+		}
+		else
+		{
+			diff = -diff;
+
+			if( -diff > maxmove )
+				diff = -maxmove;
+		}
+
+		interpolationAmount += diff;
+	}
+
+	return bound( 0, interpolationAmount * 1000.0, 100 );
+}
+
+/*
++====================
++CL_ComputeClientInterpAmount
++
++Check update rate, ex_interp value and calculate lerp_msec
++====================
++*/
+void CL_ComputeClientInterpAmount( usercmd_t *cmd )
+{
+	float interp_min, interp_max;
+
+	CL_CheckUpdateRate();
+
+	interp_max = 0.2f; // hltv value
+	interp_min = max( 0.001, 1 / cl_updaterate->value );
+
+	if( cl_interp->value + 0.001 < interp_min )
+	{
+		MsgDev( D_NOTE, "ex_interp forced up to %.f msec\n", interp_min * 1000 );
+		Cvar_SetFloat( "ex_interp", interp_min );
+	}
+	else if( cl_interp->value - 0.001 > interp_max )
+	{
+		MsgDev( D_NOTE, "ex_interp forced down to %.f msec\n", interp_max * 1000 );
+		Cvar_SetFloat( "ex_interp", interp_max );
+	}
+
+	cmd->lerp_msec = CL_DriftInterpolationAmount( cl_interp->value );
+}
+
+
+
+/*
 =======================================================================
 
 CLIENT MOVEMENT COMMUNICATION
@@ -390,8 +480,7 @@ void CL_CreateCmd( void )
 	// never let client.dll calc frametime for player
 	// because is potential backdoor for cheating
 	pcmd->cmd.msec = ms;
-	pcmd->cmd.lerp_msec = cl_interp->value * 1000;
-	pcmd->cmd.lerp_msec = bound( 0, pcmd->cmd.lerp_msec, 250 );
+	CL_ComputeClientInterpAmount( &pcmd->cmd );
 
 	V_ProcessOverviewCmds( &pcmd->cmd );
 	V_ProcessShowTexturesCmds( &pcmd->cmd );
@@ -2008,7 +2097,12 @@ void Host_ClientFrame( void )
 			if( !cl.video_prepped ) CL_PrepVideo();
 			if( !cl.audio_prepped ) CL_PrepSound();
 		}
-	
+
+		// send a new command message to the server
+		CL_SendCommand();
+
+		// predict all unacknowledged movements
+		CL_PredictMovement();
 	}
 	// update the screen
 	SCR_UpdateScreen ();
@@ -2016,12 +2110,6 @@ void Host_ClientFrame( void )
 	{
 		// update audio
 		S_RenderFrame( &cl.refdef );
-
-		// send a new command message to the server
-		CL_SendCommand();
-
-		// predict all unacknowledged movements
-		CL_PredictMovement();
 
 		// decay dynamic lights
 		CL_DecayLights ();

@@ -1144,8 +1144,6 @@ void CL_PredictMovement( void )
 		// restore viewangles from cmd.angles
 		VectorCopy( cl.refdef.cmd->viewangles, cl.refdef.cl_viewangles );
 	}
-
-	if( !CL_IsInGame( )) return;
 	
 	CL_SetUpPlayerPrediction( false, false );
 
@@ -1342,12 +1340,13 @@ void CL_PredictMovement( void )
 
 			if( ent )
 			{
-				vec3_t delta;
-				delta[0] = ent->curstate.origin[0] - ent->prevstate.origin[0];
-				delta[1] = ent->curstate.origin[1] - ent->prevstate.origin[1];
-				delta[2] = ent->curstate.origin[2] - ent->prevstate.origin[2];
+				vec2_t delta;
 
-				if( VectorLength( delta ) > 0.0f )
+				Vector2Subtract( ent->curstate.origin, ent->prevstate.origin, delta );
+				// DON'T ENABLE THIS. OTHERWISE IT WILL BREAK ELEVATORS IN MULTIPLAYER
+				// delta[2] = ent->curstate.origin[2] - ent->prevstate.origin[2];
+
+				if( !Vector2IsNull( delta ) )
 				{
 					cl.predicted.moving = 1;
 					cl.predicted.correction_time = 0;
