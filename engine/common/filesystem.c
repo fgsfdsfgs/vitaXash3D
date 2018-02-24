@@ -3151,8 +3151,13 @@ qboolean FS_Rename( const char *oldname, const char *newname )
 	if( !oldname || !newname || !*oldname || !*newname )
 		return false;
 
+#ifdef __vita__
+	Q_snprintf( oldpath, sizeof( oldpath ), CWD "/%s%s", fs_gamedir, oldname );
+	Q_snprintf( newpath, sizeof( newpath ), CWD "/%s%s", fs_gamedir, newname );
+#else
 	Q_snprintf( oldpath, sizeof( oldpath ), "%s%s", fs_gamedir, oldname );
 	Q_snprintf( newpath, sizeof( newpath ), "%s%s", fs_gamedir, newname );
+#endif
 
 	COM_FixSlashes( oldpath );
 	COM_FixSlashes( newpath );
@@ -3177,7 +3182,11 @@ qboolean FS_Delete( const char *path )
 	if( !path || !*path )
 		return false;
 
+#ifdef __vita__
+	Q_snprintf( real_path, sizeof( real_path ), CWD "/%s%s", fs_gamedir, path );
+#else
 	Q_snprintf( real_path, sizeof( real_path ), "%s%s", fs_gamedir, path );
+#endif
 	COM_FixSlashes( real_path );
 	iRet = remove( real_path );
 
