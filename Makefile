@@ -59,6 +59,7 @@ $(TARGET).vpk: $(TARGET).velf
 		--add build/sce_sys/icon0.png=sce_sys/icon0.png \
 		--add build/sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
 		--add build/sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
+		--add build/sce_sys/livearea/contents/frame2.png=sce_sys/livearea/contents/frame2.png \
 		--add build/sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
 		$(TARGET).vpk
 

@@ -61,6 +61,8 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 
 #ifdef __vita__
 unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
+static char *vita_argv[] = { "xash3d", NULL, NULL, NULL };
+static int vita_argc = 1;
 
 int xash_main( unsigned int argc, void *argv );
 
@@ -78,6 +80,23 @@ int main( int argc, char **argv )
 	sceIoMkdir( "ux0:/data/xash3d", 0775 );
 	sceIoMkdir( "ux0:/data/xash3d/valve", 0775 );
 	sceIoMkdir( "ux0:/data/xash3d/valve/save", 0775 ); // crashes without this dir
+
+	// inject command line from livearea buttons
+	SceAppUtilAppEventParam eventParam;
+	memset( &eventParam, 0, sizeof(SceAppUtilAppEventParam) );
+	sceAppUtilReceiveAppEvent( &eventParam );
+	if( eventParam.type == 0x05 )
+	{
+		char buffer[2048] = { 0 };
+		sceAppUtilAppEventParseLiveArea( &eventParam, buffer );
+		if( !strncmp( buffer, "-log", 4 ) )
+		{
+			vita_argv[1] = "-log";
+			vita_argv[2] = "-dev";
+			vita_argv[3] = "5";
+			vita_argc = 4;
+		}
+	} 
 
 	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x800000, 0, 0, NULL );
 	if( main_thread >= 0 )
@@ -119,8 +138,13 @@ int main( int argc, char** argv )
 	Com_LoadLibrary("client", 0 );
 #endif
 
+#ifdef __vita__
+	g_iArgc = vita_argc;
+	g_pszArgv = vita_argv;
+#else
 	g_iArgc = argc;
 	g_pszArgv = argv;
+#endif
 #if TARGET_OS_IPHONE
 	{
 		void IOS_LaunchDialog( void );

@@ -155,7 +155,7 @@ Default build-depended cvar and constant values
 
 // allow override for developer/debug builds
 #ifndef DEFAULT_DEV
-	#define DEFAULT_DEV 5
+	#define DEFAULT_DEV 0
 #endif
 
 #ifndef DEFAULT_FULLSCREEN

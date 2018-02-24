@@ -122,16 +122,15 @@ void Sys_InitLog( void )
 {
 	const char	*mode;
 
-#ifdef __vita__
-	s_ld.log_active = true;
-	Q_strncpy( s_ld.log_path, CWD "/engine.log", sizeof( s_ld.log_path ));
-#else
 	if( Sys_CheckParm( "-log" ) && host.developer != 0 )
 	{
 		s_ld.log_active = true;
+#ifdef __vita__
+		Q_strncpy( s_ld.log_path, CWD "/engine.log", sizeof( s_ld.log_path ));
+#else
 		Q_strncpy( s_ld.log_path, "engine.log", sizeof( s_ld.log_path ));
-	}
 #endif
+	}
 
 	if( host.change_game )
 		mode = "a";
