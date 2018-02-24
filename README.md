@@ -11,7 +11,6 @@ Any other GoldSrc mod/game would require some modifications to be able to hardli
 ## Status/Known issues
 You can create issues for anything that is not listed here.
 * Graphics:
-  * skybox textures render as the "missing texture" texture;
   * dynamic lights cause artifacts in lightmaps, esp. if the dlight hits a transparent surface;
   * model lighting is somewhat broken: there's no normals or glShadeModel;
   * if the engine fails to load a texture for a decal or sprite it will infinitely retry loading it, lagging the game to hell;
@@ -29,10 +28,6 @@ You can create issues for anything that is not listed here.
   * deadzones are hardcoded and there's no analog rescaling.
 * Game:
   * saving/loading and map transitions via changelevel need extensive testing;
-  * cl_lw breaks a lot of weapons (or does it?), so keep it disabled for now;
-  * player's guns produce no bullet impact decals, sparks, brass or tracers, or produce them at the wrong location; other guns (enemies' and mounted) seem to work fine in this regard;
-  * func_breakable gibs don't spawn or spawn at the wrong location;
-  * func_pushables slide endlessly after you push them as if there's no friction;
   * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
 * Misc:
   * code quality is absolute ass, there's ifdefs everywhere, will have to either remove them and make a standalone port or add Vita as a platform properly;
