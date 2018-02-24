@@ -27,9 +27,11 @@ You can create issues for anything that is not listed here.
   * button->key and joystick axis mappings are hardcoded;
   * deadzones are hardcoded and there's no analog rescaling.
 * Game:
+  * apparently after enough mapchanges the engine runs out of memory and dies a horrible death, but this is unconfirmed;
   * saving/loading and map transitions via changelevel need extensive testing;
   * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
 * Misc:
+  * -fno-short-enums generates billions of warnings and is probably not safe to use, but it seems to work fine, so ignore them for now;
   * code quality is absolute ass, there's ifdefs everywhere, will have to either remove them and make a standalone port or add Vita as a platform properly;
   * heap size might be too small, but increasing it to 192 makes it crash on startup;
   * file I/O is slow as shit, investigate;
@@ -47,7 +49,8 @@ Run `make` in this directory. This should produce a VPK.
 2. Copy the `build/data` directory to `ux0:/` on your Vita. Replace everything if asked.
 3. Delete everything from `valve/cl_dlls` and `valve/dlls`.
 4. Install the VPK obtained after building the port.
-5. Run it. The console log is saved to `ux0:/data/xash3d/engine.log`.
+5. Run it.
+Selecting the "Dev Mode" icon enables advanced logging and debug features, so use that for debugging. The log will be saved to `ux0:/data/xash3d/engine.log`.
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS;
