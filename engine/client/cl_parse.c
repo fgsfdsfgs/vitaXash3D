@@ -1536,9 +1536,12 @@ void CL_ParseServerMessage( sizebuf_t *msg )
 			Host_AbortCurrentFrame ();
 			break;
 		case svc_changing:
-			if( BF_ReadOneBit( msg ))
+			if( BF_ReadOneBit( msg ) )
 			{
-				cls.changelevel = true;
+				// if it's local client, do not clean states on serverdata packet
+				if( Host_IsLocalClient() )
+					cls.changelevel = true;
+
 				S_StopAllSounds();
 
 				if( cls.demoplayback )
