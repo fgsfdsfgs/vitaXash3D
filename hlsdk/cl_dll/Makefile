@@ -73,9 +73,9 @@ CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
 AR        = $(PREFIX)-ar
 
-INCLUDES = -I../common -I. -I../game_shared -I../pm_shared -I../engine -I../dlls -I../utils/false_vgui/include -include "classhacks.h"
+INCLUDES = -I../common -I. -I../game_shared -I../pm_shared -I../engine -I../dlls -I../utils/false_vgui/include -include "../symhacks.h"
 DEFINES = -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -DCLIENT_WEAPONS -DCLIENT_DLL
-CFLAGS = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -Wno-write-strings -fsigned-char -fno-lto $(DEFINES) $(INCLUDES)
+CFLAGS = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -Wno-write-strings -fsigned-char -fno-short-enums -fno-lto $(DEFINES) $(INCLUDES)
 CXXFLAGS = $(CFLAGS) -fno-exceptions -std=c++11 -fpermissive
 ASFLAGS = $(CFLAGS)
 

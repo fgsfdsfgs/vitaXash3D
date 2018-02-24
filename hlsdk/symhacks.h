@@ -14,8 +14,8 @@
 ****/
 #pragma once
 
-#ifndef CLASSHACKS_H
-#define CLASSHACKS_H
+#ifndef SYMHACKS_H
+#define SYMHACKS_H
 
 #if defined CLIENT_DLL
 
@@ -171,6 +171,18 @@
 #define g_onladder CLDLL_g_onladder
 #define pmove CLDLL_pmove
 #define movevars CLDLL_movevars
+
+#else // have to isolate some gamedll vars as well
+
+#define g_bhopcap SVDLL_g_bhopcap
+#define g_onladder SVDLL_g_onladder
+#define pmove SVDLL_pmove
+#define movevars SVDLL_movevars
+#define gSkillData SVDLL_gSkillData
+#define gEntvarsDescription SVDLL_gEntvarsDescription
+#define g_vecZero SVDLL_g_VecZero
+#define gmsgWeapPickup SVDLL_gmsgWeapPickup
+#define seed_table SVDLL_seed_table
 
 #endif
 
