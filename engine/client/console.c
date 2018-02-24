@@ -259,7 +259,9 @@ Con_ToggleConsole_f
 */
 void Con_ToggleConsole_f( void )
 {
+#ifndef __vita__
 	if( !host.developer ) return;	// disabled
+#endif
 
 	if( UI_CreditsActive( )) return; // disabled by final credits
 
@@ -1939,7 +1941,11 @@ Scroll it up or down
 void Con_RunConsole( void )
 {
 	// decide on the destination height of the console
+#ifdef __vita__
+	if( cls.key_dest == key_console )
+#else
 	if( host.developer && cls.key_dest == key_console )
+#endif
 	{
 		if( cls.state == ca_disconnected )
 			con.finalFrac = 1.0f;// full screen
