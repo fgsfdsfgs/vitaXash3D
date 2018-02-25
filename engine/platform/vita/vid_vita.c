@@ -381,4 +381,32 @@ void R_Free_OpenGL( void )
 	glw_state.initialized = false;
 }
 
+/* GL WRAPPERS */
+
+// hackfix alpha test bugs and texture format inconsistencies
+// backported from FWGS' nanogl
+void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
+{
+	uint8_t *data = (uint8_t*)pixels;
+
+	if( internalformat == GL_RGB && format == GL_RGBA ) // strip alpha from texture
+	{
+		uint8_t *in = data, *out;
+		int i = 0, size = width * height * 4;
+
+		data = out = malloc( size );
+	
+		for( i = 0; i < size; i += 4, in += 4, out += 4 )
+		{
+			memcpy( out, in, 3 );
+			out[3] = 255;
+		}
+	}
+
+	internalformat = format;
+	glTexImage2D( target, level, internalformat, width, height, border, format, type, data );
+
+	if( data != pixels ) free( data );
+}
+
 #endif // XASH_VIDEO

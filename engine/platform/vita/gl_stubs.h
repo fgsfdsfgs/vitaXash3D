@@ -188,9 +188,12 @@ static inline void glNormal3fv( GLfloat *v ) { }
 
 static inline void glTexParameterfv( GLenum targ, GLenum opt, GLfloat *params ) { glTexParameterf( targ, opt, params[0] ); }
 
+// wrapper, defined in vid_vita.c
+void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels );
+
 static inline void glTexImage1D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-	glTexImage2D( GL_TEXTURE_2D, level, internalformat, width, 1, border, format, type, pixels );
+	pglTexImage2D( GL_TEXTURE_2D, level, internalformat, width, 1, border, format, type, pixels );
 }
 static inline void glTexSubImage1D( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
 {
@@ -199,7 +202,7 @@ static inline void glTexSubImage1D( GLenum target, GLint level, GLint xoffset, G
 
 static inline void glTexImage3D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-	glTexImage2D( GL_TEXTURE_2D, level, internalformat, width, height, border, format, type, pixels );
+	pglTexImage2D( GL_TEXTURE_2D, level, internalformat, width, height, border, format, type, pixels );
 }
 static inline void glTexSubImage3D( GLenum target, GLint level,
                       GLint xoffset, GLint yoffset,
@@ -210,5 +213,7 @@ static inline void glTexSubImage3D( GLenum target, GLint level,
 {
 	glTexSubImage2D( GL_TEXTURE_2D, level, xoffset, yoffset, width, height, format, type, pixels );
 }
+
+
 
 #endif /* GL_STUBS_H */

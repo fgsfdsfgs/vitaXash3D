@@ -1368,15 +1368,9 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	if( pic->flags & IMAGE_HAS_ALPHA )
 		tex->flags |= TF_HAS_ALPHA;
 
-#ifdef __vita__
-	// apparently xash forces all textures to RGBA anyway
-	outFormat = GL_RGBA;
-	inFormat = GL_RGBA;
-#else
 	// determine format
 	inFormat = PFDesc[pic->type].glFormat;
 	outFormat = GL_TextureFormat( tex, &samples );
-#endif
 
 	tex->format = outFormat;
 
@@ -1389,10 +1383,8 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	if( tex->flags & TF_FLOATDATA )
 		dataType = GL_FLOAT;
 
-#ifndef __vita__
 	if( tex->flags & TF_DEPTHMAP )
 		inFormat = GL_DEPTH_COMPONENT;
-#endif
 
 	if( pic->flags & IMAGE_CUBEMAP )
 	{

@@ -1505,7 +1505,7 @@ The xash gl functions will be redefined so they are prefixed with "gl" instead o
 #define pglTexGeni		MANGLE(TexGeni)
 #define pglTexGeniv		MANGLE(TexGeniv)
 #define pglTexImage1D		MANGLE(TexImage1D)
-#define pglTexImage2D		MANGLE(TexImage2D)
+//#define pglTexImage2D		MANGLE(TexImage2D)
 #define pglTexImage2DMultisample		MANGLE(TexImage2DMultisample)
 #define pglTexImage3DEXT		MANGLE(TexImage3DEXT)
 #define pglTexImage3D		MANGLE(TexImage3D)
