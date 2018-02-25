@@ -28,6 +28,7 @@ You can create issues for anything that is not listed here.
   * deadzones are hardcoded and there's no analog rescaling.
 * Game:
   * apparently after enough mapchanges the engine runs out of memory and dies a horrible death, but this is unconfirmed;
+  * saving is SLOW, autosaves hang the game for 20-60 seconds;
   * saving/loading and map transitions via changelevel need extensive testing;
   * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
 * Misc:
