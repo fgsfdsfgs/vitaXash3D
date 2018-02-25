@@ -8,7 +8,7 @@ HLSDK is statically linked into the engine executable, so you can only use this 
 
 Any other GoldSrc mod/game that has custom DLLs would require some modifications to be able to hardlink in the same way, I'll write a guide on that later.
 
-Mod support for mods that don't have their own DLLs (e. g. USS Darkstar) is currently broken as well.
+Mod support for mods that don't have their own DLLs (e. g. USS Darkstar) is currently broken as well, but you can run custom Half-Life maps.
 
 ## Requirements
 - VitaSDK (in PATH and with VITASDK set);
@@ -27,7 +27,7 @@ you can use the [data files](https://github.com/fgsfdsfgs/vitaXash3D/releases/do
 
 Selecting the "Dev Mode" icon enables advanced logging and debug features, so use that for debugging. The log will be saved to `ux0:/data/xash3d/engine.log`.
 
-Keep in mind that the game can hang for a long time when saving or autosaving (see issue #7), so don't kill it if it suddenly hangs when you enter a map or cross a checkpoint.
+Keep in mind that the game can hang for a long time when saving or autosaving (see issue [#7](https://github.com/fgsfdsfgs/vitaXash3D/issues/7)), so don't kill it if it suddenly hangs when you enter a map or cross a checkpoint.
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS;
