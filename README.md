@@ -6,37 +6,9 @@ This is currently very broken and not user-friendly at all. Expect severe graphi
 
 HLSDK is statically linked into the engine executable, so you can only use this with Half-Life right now.
 
-Any other GoldSrc mod/game would require some modifications to be able to hardlink in the same way, I'll write a guide on that later.
+Any other GoldSrc mod/game that has custom DLLs would require some modifications to be able to hardlink in the same way, I'll write a guide on that later.
 
-## Status/Known issues
-You can create issues for anything that is not listed here.
-* Graphics:
-  * dynamic lights cause artifacts in lightmaps, esp. if the dlight hits a transparent surface;
-  * model lighting is somewhat broken: there's no normals or glShadeModel;
-  * if the engine fails to load a texture for a decal or sprite it will infinitely retry loading it, lagging the game to hell;
-  * some translucent textures render as opaque;
-  * translucent HUD elements have "holes" in places with high color intensity;
-  * might be some issues in particle, beam and tracer rendering;
-  * BMP menu elements (`gfx/shell/btns_main.bmp` & co in WON HL's `pak0.pak` or in the unpatched `extras.pak`) don't render at all, so they're disabled for now;
-  * rendering is slow, especially for models.
-* Sound:
-  * crackling and other shit happens whenever the game hangs/loads something;
-  * the internal mixer uses 44KHz sample rate, while snd_vita uses 48KHz, making sound a bit too high pitched.
-* Input:
-  * Vita buttons map to keyboard keys, analog sticks are actually handled like joysticks;
-  * button->key and joystick axis mappings are hardcoded;
-  * deadzones are hardcoded and there's no analog rescaling.
-* Game:
-  * apparently after enough mapchanges the engine runs out of memory and dies a horrible death, but this is unconfirmed;
-  * saving is SLOW, autosaves hang the game for 20-60 seconds;
-  * saving/loading and map transitions via changelevel need extensive testing;
-  * HLSDK is statically linked into the engine executable, so there's no easy way to change/port mods.
-* Misc:
-  * -fno-short-enums generates billions of warnings and is probably not safe to use, but it seems to work fine, so ignore them for now;
-  * code quality is absolute ass, there's ifdefs everywhere, will have to either remove them and make a standalone port or add Vita as a platform properly;
-  * heap size might be too small, but increasing it to 192 makes it crash on startup;
-  * file I/O is slow as shit, investigate;
-  * networking is broken and currently is not a priority.
+Mod support for mods that don't have their own DLLs (e. g. USS Darkstar) is currently broken as well.
 
 ## Requirements
 - VitaSDK (in PATH and with VITASDK set);
@@ -52,7 +24,10 @@ you can use the [data files](https://github.com/fgsfdsfgs/vitaXash3D/releases/do
 3. Delete everything from `valve/cl_dlls` and `valve/dlls`.
 4. Install the VPK obtained after building the port.
 5. Run it.
+
 Selecting the "Dev Mode" icon enables advanced logging and debug features, so use that for debugging. The log will be saved to `ux0:/data/xash3d/engine.log`.
+
+Keep in mind that the game can hang for a long time when saving or autosaving (see issue #7), so don't kill it if it suddenly hangs when you enter a map or cross a checkpoint.
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS;
