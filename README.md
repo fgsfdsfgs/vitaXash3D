@@ -45,7 +45,8 @@ You can create issues for anything that is not listed here.
 Run `make` in this directory. This should produce a VPK.
 
 ## Running
-1. Copy the `valve` directory from your Half-Life installation (preferably the Steam version) to `ux0:/data/xash3d/` on your Vita.
+1. Copy the `valve` directory from your Half-Life installation (preferably the Steam version) to `ux0:/data/xash3d/` on your Vita. If you don't have access to a Half-Life installation,
+you can use the [data files](https://github.com/fgsfdsfgs/vitaXash3D/releases/download/v1/uplink.zip) from the free demo version of HL, Half-Life Uplink.
 2. Copy the `build/data` directory to `ux0:/` on your Vita. Replace everything if asked.
 3. Delete everything from `valve/cl_dlls` and `valve/dlls`.
 4. Install the VPK obtained after building the port.
