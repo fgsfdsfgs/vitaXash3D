@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include <winsock.h>
 #include <wsipx.h>
 #define socklen_t int //#include <ws2tcpip.h>
-#else
+#elif !defined(__vita__)
 // BSD sockets
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -170,48 +170,233 @@ void NET_Restart_f( void );
 
 // vita doesn't have some socket functions we need, so let's provide them.
 // most of these implementations are taken straight from Rinnegatamante's
-// Quake II port: https://github.com/Rinnegatamante/vitaQuakeII
+// Quake port: https://github.com/Rinnegatamante/vitaQuake
 // be wary that shit that is redefined here might be added to vitasdk later
 #ifdef __vita__
 
-#define INADDR_ANY 0
-#define INADDR_BROADCAST -1
-#define INADDR_NONE -1
+#include <vitasdk.h>
+
 #define SOCKET_ERROR -1
-#define FIONBIO SCE_NET_SO_NBIO
+#define AF_INET SCE_NET_AF_INET
+#define PF_INET AF_INET
+#define SOCK_DGRAM SCE_NET_SOCK_DGRAM
+#define SOCK_STREAM SCE_NET_SOCK_STREAM
+#define IPPROTO_UDP SCE_NET_IPPROTO_UDP
+#define IPPROTO_TCP SCE_NET_IPPROTO_TCP
+#define SOL_SOCKET SCE_NET_SOL_SOCKET
+#define MSG_PEEK SCE_NET_MSG_PEEK
+#define INADDR_BROADCAST SCE_NET_INADDR_BROADCAST
+#define SO_BROADCAST SCE_NET_SO_BROADCAST
+#define INADDR_ANY SCE_NET_INADDR_ANY
+#define SO_NBIO SCE_NET_SO_NBIO
+#define FIONBIO SO_NBIO
 
-static char *inet_ntoa( struct in_addr in )
-{
-	static char s[64];
-	// FIXME: I don't know if this has to be byteorder aware
-	unsigned char *b = ( unsigned char * ) &in;
-	Q_snprintf( s, sizeof(s), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
-	return s;
-}
+#define EWOULDBLOCK SCE_NET_EWOULDBLOCK
+#define EADDRNOTAVAIL SCE_NET_EADDRNOTAVAIL
+#define EAFNOSUPPORT SCE_NET_EAFNOSUPPORT
+#define ECONNRESET SCE_NET_ECONNRESET
+#define ENOTCONN SCE_NET_ENOTCONN
+#define EINPROGRESS SCE_NET_EINPROGRESS
 
-static in_addr_t inet_addr( const char *s )
+#define MAX_NAME 512
+struct hostent
 {
-	in_addr_t ret;
-	sceNetInetPton( SCE_NET_AF_INET, s, (int *)&ret );
-	return ret;
-}
-
-// TODO: what the fuck even is the hostname of a vita?
-static int gethostname( char *name, int namelen )
-{
-	Q_snprintf( name, namelen, "localhost" );
-	return 0;
-}
-
-// afaik this is only used to set non-blocking mode on sockets
-static int ioctl_socket( int fd, int req, unsigned int *arg )
-{
-	int ret = sceNetSetsockopt( fd, SCE_NET_SOL_SOCKET, req, arg, sizeof(unsigned int) );
-	return ( ret < 0 ) ? SOCKET_ERROR : 0;
-}
+	char  *h_name;         /* official (cannonical) name of host               */
+	char **h_aliases;      /* pointer to array of pointers of alias names      */
+	int    h_addrtype;     /* host address type: AF_INET                       */
+	int    h_length;       /* length of address: 4                             */
+	char **h_addr_list;    /* pointer to array of pointers with IPv4 addresses */
+};
+#define h_addr h_addr_list[0]
 
 #undef pIoctlSocket
 #define pIoctlSocket ioctl_socket
+#undef pCloseSocket
+#define pCloseSocket closesock
+
+#define htons sceNetHtons
+#define htonl sceNetHtonl
+#define ntohs sceNetNtohs
+#define ntohl sceNetNtohl
+
+typedef unsigned int in_addr_t;
+typedef unsigned int socklen_t;
+
+static int *net_errno; // TO BE FILLED
+#define errno (*net_errno)
+
+static void *net_memory = NULL;
+#define NET_INIT_SIZE 1*1024*1024
+
+static qboolean vita_net_initialized = false;
+
+struct in_addr
+{
+	in_addr_t s_addr;  // load with inet_aton()
+};
+
+struct sockaddr_in
+{
+	short            sin_family;   // e.g. AF_INET
+	unsigned short   sin_port;     // e.g. htons(3490)
+	struct in_addr   sin_addr;     // see struct in_addr, below
+	char             sin_zero[8];  // zero this if you want to
+};
+
+struct sockaddr
+{
+	unsigned short    sa_family;    // address family, AF_xxx
+	char              sa_data[14];  // 14 bytes of protocol address
+};
+
+static inline int convertSceNetSockaddrIn(struct SceNetSockaddrIn* src, struct sockaddr_in* dst)
+{
+	if (dst == NULL || src == NULL) return -1;
+	dst->sin_family = src->sin_family;
+	dst->sin_port = src->sin_port;
+	dst->sin_addr.s_addr = src->sin_addr.s_addr;
+	return 0;
+}
+
+static inline int convertSockaddrIn(struct SceNetSockaddrIn* dst, const struct sockaddr_in* src)
+{
+	if (dst == NULL || src == NULL) return -1;
+	dst->sin_family = src->sin_family;
+	dst->sin_port = src->sin_port;
+	dst->sin_addr.s_addr = src->sin_addr.s_addr;
+	return 0;
+}
+
+static inline int convertSceNetSockaddr(struct SceNetSockaddr* src, struct sockaddr* dst)
+{
+	if (dst == NULL || src == NULL) return -1;
+	dst->sa_family = src->sa_family;
+	memcpy(dst->sa_data,src->sa_data,14);
+	return 0;
+}
+
+static inline int convertSockaddr(struct SceNetSockaddr* dst, const struct sockaddr* src)
+{
+	if( dst == NULL || src == NULL ) return -1;
+	dst->sa_family = src->sa_family;
+	memcpy(dst->sa_data,src->sa_data,14);
+	return 0;
+}
+
+static inline int socket( int domain, int type, int protocol )
+{
+	return sceNetSocket( "Socket", domain, type, protocol );
+}
+
+static inline int connect( int sockfd, struct sockaddr *to, unsigned int addrlen )
+{
+	struct SceNetSockaddr tmp;
+	if (to != NULL) convertSceNetSockaddr( &tmp, to );
+	return sceNetConnect( sockfd, &tmp, addrlen );
+}
+
+static inline int send( int sockfd, const void *buf, unsigned long len, int flags )
+{
+	return sceNetSend( sockfd, buf, len, flags );
+}
+
+static inline int recv( int sockfd, void *buf, unsigned long len, int flags )
+{
+	return sceNetRecv( sockfd, buf, len, flags );
+}
+
+static inline int recvfrom( int sockfd, void* buf, long len, int flags, struct sockaddr* src_addr, socklen_t* addrlen )
+{
+	struct SceNetSockaddr tmp;
+	int res = sceNetRecvfrom( sockfd, buf, len, flags, &tmp, addrlen );
+	if (src_addr != NULL) convertSceNetSockaddr( &tmp, src_addr );
+	return res;
+}
+
+static inline in_addr_t inet_addr( const char *cp )
+{
+	int32_t b1, b2, b3, b4;
+	int res = sscanf( cp, "%d.%d.%d.%d", &b1, &b2, &b3, &b4 );
+	if( res != 4 ) return (in_addr_t)(-1); // is actually expected behavior
+	return htonl( (b1 << 24) | (b2 << 16) | (b3 << 8) | b4 );
+}
+
+static inline int gethostname( char *name, int maxlen )
+{
+	Q_strncpy( name, "localhost", maxlen );
+	return 0;
+}
+
+static inline int getsockname( int sockfd, struct sockaddr *addr, unsigned int *addrlen )
+{
+	struct SceNetSockaddr tmp;
+	convertSockaddr( &tmp, addr );
+	int res = sceNetGetsockname( sockfd, &tmp, addrlen );
+	convertSceNetSockaddr( &tmp, addr );
+	return res;
+}
+
+static inline int bind( int sockfd, const struct sockaddr* addr, unsigned int addrlen )
+{
+	struct SceNetSockaddr tmp;
+	convertSockaddr( &tmp, addr );
+	return sceNetBind( sockfd, &tmp, addrlen );
+}
+
+static inline int closesock(int sockfd)
+{
+	return sceNetSocketClose( sockfd );
+}
+
+static inline int setsockopt( int sockfd, int level, int optname, const void *optval, unsigned int optlen )
+{
+	return sceNetSetsockopt( sockfd, level, optname, optval, optlen );
+}
+
+static inline unsigned int sendto( int sockfd, const void *buf, unsigned int len, int flags, const struct sockaddr *dest_addr, unsigned int addrlen )
+{
+	struct SceNetSockaddr tmp;
+	convertSockaddr( &tmp, dest_addr );
+	return sceNetSendto( sockfd, buf, len, flags, &tmp, addrlen );
+}
+
+static struct hostent *gethostbyname( const char *name )
+{
+	static struct hostent ent;
+	static char sname[MAX_NAME] = "";
+	static struct SceNetInAddr saddr = { 0 };
+	static char *addrlist[2] = { (char *) &saddr, NULL };
+
+	int rid = sceNetResolverCreate( "resolver", NULL, 0 );
+	if( rid < 0 ) return NULL;
+
+	int err = sceNetResolverStartNtoa( rid, name, &saddr, 0, 0, 0 );
+	sceNetResolverDestroy( rid );
+	if( err < 0 ) return NULL;
+
+	ent.h_name = sname;
+	ent.h_aliases = 0;
+	ent.h_addrtype = SCE_NET_AF_INET;
+	ent.h_length = sizeof( struct SceNetInAddr );
+	ent.h_addr_list = addrlist;
+	ent.h_addr = addrlist[0];
+
+	return &ent;
+}
+
+static inline char *inet_ntoa( struct in_addr in )
+{
+	static char buf[32];
+	int ip = ntohl( in.s_addr );
+	snprintf( buf, sizeof(buf), "%d.%d.%d.%d", (ip >> 24) & 0xff, (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff );
+	return buf;
+}
+
+// afaik this is only used to set non-blocking mode on sockets
+static inline int ioctl_socket( int fd, int req, unsigned int *arg )
+{
+	return sceNetSetsockopt( fd, SCE_NET_SOL_SOCKET, req, arg, sizeof(unsigned int) );
+}
 
 #endif // __vita__
 
@@ -271,6 +456,13 @@ char *NET_ErrorString( void )
 	case WSANO_DATA: return "WSANO_DATA";
 	default: return "NO ERROR";
 	}
+}
+#elif defined( __vita__ )
+char *NET_ErrorString( )
+{
+	static char buf[256];
+	snprintf( buf, 256, "Error 0x%08X", errno );
+	return buf;
 }
 #else
 #define NET_ErrorString(x) strerror(errno)
@@ -627,7 +819,6 @@ qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *lengt
 #else
 		if( ret < 0 )
 		{
-
 			// WSAEWOULDBLOCK and WSAECONNRESET are silent
 			if( errno == EWOULDBLOCK || errno == ECONNRESET )
 #endif
@@ -1115,6 +1306,33 @@ void NET_Init( void )
 	if( Sys_CheckParm( "-noipx" )) noipx = true;
 #endif
 
+#if defined( __vita__) 
+	if( !noip )
+	{
+		net_errno = sceNetErrnoLoc();
+		SceNetInitParam initparam;
+		int ret = sceNetShowNetstat( );
+		if( ret == SCE_NET_ERROR_ENOTINIT )
+		{
+			net_memory = malloc( NET_INIT_SIZE );
+			initparam.memory = net_memory;
+			initparam.size = NET_INIT_SIZE;
+			initparam.flags = 0;
+			ret = sceNetInit( &initparam );
+			if (ret < 0) { MsgDev( D_WARN, "NET_Init(): sceNetShowNetstat failed: 0x%08x\n", ret ); goto fuckup; }
+		}
+		ret = sceNetCtlInit( );
+		if( ret < 0 )
+		{
+			sceNetTerm();
+			free( net_memory );
+			MsgDev( D_WARN, "NET_Init(): sceNetCtlInit failed: 0x%08x\n", ret );
+			goto fuckup;
+		}
+		vita_net_initialized = true;
+	}
+fuckup:
+#endif
 	winsockInitialized = true;
 	MsgDev( D_NOTE, "NET_Init()\n" );
 }
@@ -1137,6 +1355,15 @@ void NET_Shutdown( void )
 #ifdef _WIN32
 	pWSACleanup();
 	NET_FreeWinSock();
+#elif defined( __vita__ )
+	if( vita_net_initialized )
+	{
+		sceNetCtlTerm();
+		sceNetTerm();
+		free( net_memory );
+		net_memory = NULL;
+		vita_net_initialized = false;
+	}
 #endif
 	winsockInitialized = false;
 }
