@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #define u64 uint64_t
 #define u8 uint8_t
 
-#define SAMPLE_RATE 48000
+#define SAMPLE_RATE 44100
 #define AUDIOSIZE 16384
 
 extern convar_t *s_primary;
@@ -37,7 +37,7 @@ static float tickRate;
 
 static int audio_thread( int args, void *argp )
 {
-	chn = sceAudioOutOpenPort( SCE_AUDIO_OUT_PORT_TYPE_MAIN, AUDIOSIZE / 4, SAMPLE_RATE, SCE_AUDIO_OUT_MODE_STEREO );
+	chn = sceAudioOutOpenPort( SCE_AUDIO_OUT_PORT_TYPE_BGM, AUDIOSIZE / 4, SAMPLE_RATE, SCE_AUDIO_OUT_MODE_STEREO );
 	sceAudioOutSetConfig( chn, -1, -1, -1 );
 	int vol[] = { 32767, 32767 };
 	sceAudioOutSetVolume( chn, SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH, vol );
