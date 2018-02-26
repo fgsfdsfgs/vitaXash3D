@@ -291,7 +291,7 @@ static inline int socket( int domain, int type, int protocol )
 static inline int connect( int sockfd, struct sockaddr *to, unsigned int addrlen )
 {
 	struct SceNetSockaddr tmp;
-	if (to != NULL) convertSceNetSockaddr( &tmp, to );
+	if (to != NULL) convertSockaddr( &tmp, to );
 	return sceNetConnect( sockfd, &tmp, addrlen );
 }
 
