@@ -429,6 +429,11 @@ Only used for FS_Open.
 void FS_CreatePath( char *path )
 {
 	char *ofs, save;
+#ifdef __vita__
+	char realpath[MAX_SYSPATH];
+	Q_snprintf( realpath, MAX_SYSPATH, CWD "/%s", path );
+	path = realpath;
+#endif
 
 	for( ofs = path+1; *ofs; ofs++ )
 	{
