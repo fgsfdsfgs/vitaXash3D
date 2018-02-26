@@ -129,9 +129,6 @@ void UI_LoadBmpButtons( void )
 {
 	memset( uiStatic.buttonsPics, 0, sizeof( uiStatic.buttonsPics ));
 
-#ifdef __vita__
-	return; // FIXME: BMP buttons don't render on vita
-#endif
 	int bmp_len_holder;
 	byte *bmp_buffer = (byte*)LOAD_FILE( ART_BUTTONS_MAIN, &bmp_len_holder );
 
