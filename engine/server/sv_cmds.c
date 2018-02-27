@@ -579,7 +579,9 @@ void SV_AutoSave_f( void )
 		return;
 	}
 
-	SV_SaveGame( "autosave" );
+	extern convar_t *sv_autosave;
+	if( sv_autosave->integer )
+		SV_SaveGame( "autosave" );
 }
 
 /*

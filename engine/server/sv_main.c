@@ -116,6 +116,7 @@ convar_t	*sv_allow_touch;
 convar_t	*sv_allow_mouse;
 convar_t	*sv_allow_joystick;
 convar_t	*sv_allow_vr;
+convar_t	*sv_autosave;
 
 void Master_Shutdown( void );
 
@@ -979,6 +980,7 @@ void SV_Init( void )
 	sv_maxpacket = Cvar_Get( "sv_maxpacket", "2000", CVAR_ARCHIVE, "limit cl_maxpacket for all clients" );
 	sv_forcesimulating = Cvar_Get( "sv_forcesimulating", "0", CVAR_ARCHIVE, "forcing world simulating when server don't have active players" );
 	sv_nat = Cvar_Get( "sv_nat", "0", 0, "enable NAT bypass for this server" );
+	sv_autosave = Cvar_Get ("sv_autosave", "1", CVAR_ARCHIVE, "enable auto-saving" );
 
 	sv_allow_joystick = Cvar_Get("sv_allow_joystick", "1", CVAR_ARCHIVE, "allow connect with joystick enabled" );
 	sv_allow_mouse = Cvar_Get("sv_allow_mouse", "1", CVAR_ARCHIVE, "allow connect with mouse" );

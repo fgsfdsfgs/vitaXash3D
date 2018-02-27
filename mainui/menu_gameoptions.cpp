@@ -39,6 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ID_MAXPACKET		9
 #define ID_MAXPACKETMESSAGE		10
 #define ID_ANDROIDSLEEP			11
+#define ID_AUTOSAVE			12
 
 typedef struct
 {
@@ -48,6 +49,7 @@ typedef struct
 	int		alwaysRun;
 	float maxPacket;
 	int android_sleep;
+	int autoSave;
 } uiGameValues_t;
 
 typedef struct
@@ -65,6 +67,7 @@ typedef struct
 	menuCheckBox_s	hand;
 	menuCheckBox_s	allowDownload;
 	menuCheckBox_s	alwaysRun;
+	menuCheckBox_s	autoSave;
 	menuCheckBox_s	android_sleep;
 
 	menuSpinControl_s	maxPacket;
@@ -108,6 +111,7 @@ static void UI_GameOptions_UpdateConfig( void )
 	CVAR_SET_FLOAT( "fps_max", uiGameOptions.maxFPS.curValue );
 	CVAR_SET_FLOAT( "cl_run", uiGameOptions.alwaysRun.enabled );
 	CVAR_SET_FLOAT( "android_sleep", uiGameOptions.android_sleep.enabled );
+	CVAR_SET_FLOAT( "sv_autosave", uiGameOptions.autoSave.enabled );
 }
 
 /*
@@ -123,6 +127,7 @@ static void UI_GameOptions_DiscardChanges( void )
 	CVAR_SET_FLOAT( "cl_run", uiGameInitial.alwaysRun );
 	CVAR_SET_FLOAT( "cl_maxpacket", uiGameInitial.maxPacket );
 	CVAR_SET_FLOAT( "android_sleep", uiGameInitial.android_sleep );
+	CVAR_SET_FLOAT( "sv_autosave", uiGameInitial.autoSave );
 }
 
 /*
@@ -162,6 +167,9 @@ static void UI_GameOptions_GetConfig( void )
 	if( CVAR_GET_FLOAT( "android_sleep" ))
 		uiGameInitial.android_sleep = uiGameOptions.android_sleep.enabled = 1;
 
+	if( CVAR_GET_FLOAT( "sv_autosave" ))
+		uiGameInitial.autoSave = uiGameOptions.autoSave.enabled = 1;
+
 	UI_GameOptions_UpdateConfig ();
 }
 
@@ -179,6 +187,7 @@ static void UI_GameOptions_Callback( void *self, int event )
 	case ID_HAND:
 	case ID_ALLOWDOWNLOAD:
 	case ID_ALWAYSRUN:
+	case ID_AUTOSAVE:
 	case ID_ANDROIDSLEEP:
 		if( event == QM_PRESSED )
 			((menuCheckBox_s *)self)->focusPic = UI_CHECKBOX_PRESSED;
@@ -272,7 +281,7 @@ static void UI_GameOptions_Init( void )
 	uiGameOptions.maxFPS.generic.statusText = "Cap your game frame rate";
 	uiGameOptions.maxFPS.minValue = 20;
 	uiGameOptions.maxFPS.maxValue = 500;
-	uiGameOptions.maxFPS.range = 20;
+	uiGameOptions.maxFPS.range = 10;
 
 	uiGameOptions.maxFPSmessage.generic.id = ID_MAXFPSMESSAGE;
 	uiGameOptions.maxFPSmessage.generic.type = QMTYPE_ACTION;
@@ -308,6 +317,15 @@ static void UI_GameOptions_Init( void )
 	uiGameOptions.alwaysRun.generic.name = "Always run";
 	uiGameOptions.alwaysRun.generic.callback = UI_GameOptions_Callback;
 	uiGameOptions.alwaysRun.generic.statusText = "Switch between run/step models when pressed 'run' button";
+
+	uiGameOptions.autoSave.generic.id = ID_AUTOSAVE;
+	uiGameOptions.autoSave.generic.type = QMTYPE_CHECKBOX;
+	uiGameOptions.autoSave.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_ACT_ONRELEASE|QMF_DROPSHADOW;
+	uiGameOptions.autoSave.generic.x = 280;
+	uiGameOptions.autoSave.generic.y = 510; // TODO: fit this properly onto the screen
+	uiGameOptions.autoSave.generic.name = "Autosaving";
+	uiGameOptions.autoSave.generic.callback = UI_GameOptions_Callback;
+	uiGameOptions.autoSave.generic.statusText = "Enable autosaving in single player";
 
 	uiGameOptions.android_sleep.generic.id = ID_ANDROIDSLEEP;
 	uiGameOptions.android_sleep.generic.type = QMTYPE_CHECKBOX;
@@ -359,6 +377,7 @@ static void UI_GameOptions_Init( void )
 #ifdef __ANDROID__
 	UI_AddItem( &uiGameOptions.menu, (void *)&uiGameOptions.android_sleep );
 #endif
+	UI_AddItem( &uiGameOptions.menu, (void *)&uiGameOptions.autoSave );
 	UI_AddItem( &uiGameOptions.menu, (void *)&uiGameOptions.maxPacket );
 	UI_AddItem( &uiGameOptions.menu, (void *)&uiGameOptions.maxPacketmessage1 );
 	UI_AddItem( &uiGameOptions.menu, (void *)&uiGameOptions.maxPacketmessage2 );

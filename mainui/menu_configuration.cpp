@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ID_MSGTEXT    8
 #define ID_TOUCH      9
 #define ID_GAMEPAD    10
+#define ID_GAME       11
 #define ID_YES        130
 #define ID_NO         131
 
@@ -54,6 +55,7 @@ typedef struct
 	menuPicButton_s	touch;
 	menuPicButton_s	update;
 	menuPicButton_s gamepad;
+	menuPicButton_s gameopt;
 	menuPicButton_s	done;
 
 	// update dialog
@@ -81,6 +83,7 @@ static void UI_CheckUpdatesDialog( void )
 {
 	// toggle configuration menu between active\inactive
 	// show\hide CheckUpdates dialog
+	uiOptions.gameopt.generic.flags ^= QMF_INACTIVE; 
 	uiOptions.controls.generic.flags ^= QMF_INACTIVE; 
 	uiOptions.audio.generic.flags ^= QMF_INACTIVE;
 	uiOptions.video.generic.flags ^= QMF_INACTIVE;
@@ -142,6 +145,9 @@ static void UI_Options_Callback( void *self, int event )
 	case ID_GAMEPAD:
 		UI_GamePad_Menu();
 		break;
+	case ID_GAME:
+		UI_GameOptions_Menu();
+		break;
 	case ID_UPDATE:
 		UI_CheckUpdatesDialog();
 		break;
@@ -184,11 +190,22 @@ static void UI_Options_Init( void )
 	uiOptions.banner.generic.height = UI_BANNER_HEIGHT;
 	uiOptions.banner.pic = ART_BANNER;
 
+	uiOptions.gameopt.generic.id	= ID_GAME;
+	uiOptions.gameopt.generic.type = QMTYPE_BM_BUTTON;
+	uiOptions.gameopt.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
+	uiOptions.gameopt.generic.x = 72;
+	uiOptions.gameopt.generic.y = 230;
+	uiOptions.gameopt.generic.name = "Game options";
+	uiOptions.gameopt.generic.statusText = "Configure various game settings";
+	uiOptions.gameopt.generic.callback = UI_Options_Callback;
+
+	UI_UtilSetupPicButton( &uiOptions.gameopt, PC_GAME_OPTIONS );
+
 	uiOptions.controls.generic.id	= ID_CONTROLS;
 	uiOptions.controls.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.controls.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
 	uiOptions.controls.generic.x = 72;
-	uiOptions.controls.generic.y = 230;
+	uiOptions.controls.generic.y = 280;
 	uiOptions.controls.generic.name = "Controls";
 	uiOptions.controls.generic.statusText = "Change keyboard and mouse settings";
 	uiOptions.controls.generic.callback = UI_Options_Callback;
@@ -199,7 +216,7 @@ static void UI_Options_Init( void )
 	uiOptions.audio.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.audio.generic.flags	= QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
 	uiOptions.audio.generic.x = 72;
-	uiOptions.audio.generic.y = 280;
+	uiOptions.audio.generic.y = 330;
 	uiOptions.audio.generic.name = "Audio";
 	uiOptions.audio.generic.statusText = "Change sound volume and quality";
 	uiOptions.audio.generic.callback = UI_Options_Callback;
@@ -210,7 +227,7 @@ static void UI_Options_Init( void )
 	uiOptions.video.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.video.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
 	uiOptions.video.generic.x = 72;
-	uiOptions.video.generic.y = 330;
+	uiOptions.video.generic.y = 380;
 	uiOptions.video.generic.name = "Video";
 	uiOptions.video.generic.statusText = "Change screen size, video mode and gamma";
 	uiOptions.video.generic.callback = UI_Options_Callback;
@@ -221,7 +238,7 @@ static void UI_Options_Init( void )
 	uiOptions.touch.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.touch.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY | QMF_ACT_ONRELEASE;
 	uiOptions.touch.generic.x = 72;
-	uiOptions.touch.generic.y = 380;
+	uiOptions.touch.generic.y = 430;
 	uiOptions.touch.generic.name = "Touch";
 	uiOptions.touch.generic.statusText = "Change touch settings and buttons";
 	uiOptions.touch.generic.callback = UI_Options_Callback;
@@ -233,7 +250,7 @@ static void UI_Options_Init( void )
 	uiOptions.gamepad.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.gamepad.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY | QMF_ACT_ONRELEASE;
 	uiOptions.gamepad.generic.x = 72;
-	uiOptions.gamepad.generic.y = 430;
+	uiOptions.gamepad.generic.y = 480;
 	uiOptions.gamepad.generic.name = "Gamepad";
 	uiOptions.gamepad.generic.statusText = "Change gamepad axis and button settings";
 	uiOptions.gamepad.generic.callback = UI_Options_Callback;
@@ -245,7 +262,7 @@ static void UI_Options_Init( void )
 	uiOptions.update.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.update.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
 	uiOptions.update.generic.x = 72;
-	uiOptions.update.generic.y = 480;
+	uiOptions.update.generic.y = 530;
 	uiOptions.update.generic.name = "Update";
 	uiOptions.update.generic.statusText = "Donwload the latest version of the Xash3D engine";
 	uiOptions.update.generic.callback = UI_Options_Callback;
@@ -258,7 +275,7 @@ static void UI_Options_Init( void )
 	uiOptions.done.generic.type = QMTYPE_BM_BUTTON;
 	uiOptions.done.generic.flags = QMF_HIGHLIGHTIFFOCUS|QMF_DROPSHADOW|QMF_NOTIFY;
 	uiOptions.done.generic.x = 72;
-	uiOptions.done.generic.y = 530;
+	uiOptions.done.generic.y = 580;
 	uiOptions.done.generic.name = "Done";
 	uiOptions.done.generic.statusText = "Go back to the Main Menu";
 	uiOptions.done.generic.callback = UI_Options_Callback;
@@ -304,6 +321,7 @@ static void UI_Options_Init( void )
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.background );
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.banner );
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.done );
+	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.gameopt );
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.controls );
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.audio );
 	UI_AddItem( &uiOptions.menu, (void *)&uiOptions.video );
