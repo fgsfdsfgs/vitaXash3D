@@ -1,4 +1,4 @@
-TARGET := vitaXash3D
+APPNAME := vitaXash3D
 TITLE := XASH00001
 
 LIBS = -L. -lxashmenu -lclient -lserver -lvitaGL \
@@ -30,12 +30,16 @@ CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
 CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -fno-lto -fno-short-enums \
             $(INCLUDES) \
-            -DXASH_STATIC -DXASH_SINGLE_BINARY
+            -DXASH_STATIC -DXASH_SINGLE_BINARY \
+            -DXASH_BUILD_COMMIT="\"$(shell git rev-parse --short HEAD 2> /dev/null || echo notset)\""
 
 CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=c++11 -fpermissive
 ASFLAGS   = $(CFLAGS)
 
-all: libxashmenu.a libclient.a libserver.a $(TARGET).vpk
+all: launcher.bin libxashmenu.a libclient.a libserver.a $(APPNAME).vpk
+
+launcher.bin:
+	$(MAKE) -C modselector
 
 libxashmenu.a:
 	$(MAKE) -C mainui
@@ -50,32 +54,33 @@ libserver.a:
 	$(MAKE) -C hlsdk/dlls clean
 	$(MAKE) -C hlsdk/dlls
 
-$(TARGET).vpk: $(TARGET).velf
-	vita-make-fself -s $< build/eboot.bin
-	vita-mksfoex -s TITLE_ID="$(TITLE)" "$(TARGET)" param.sfo
+$(APPNAME).vpk: xash.velf launcher.bin
+	vita-make-fself -s $< build/xash.bin
+	cp -f launcher.bin build/eboot.bin
+	vita-mksfoex -s TITLE_ID="$(TITLE)" "$(APPNAME)" param.sfo
 	cp -f param.sfo build/sce_sys/param.sfo
 	
 	vita-pack-vpk -s build/sce_sys/param.sfo -b build/eboot.bin \
+		--add build/xash.bin=xash.bin \
 		--add build/sce_sys/icon0.png=sce_sys/icon0.png \
 		--add build/sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
 		--add build/sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
-		--add build/sce_sys/livearea/contents/frame2.png=sce_sys/livearea/contents/frame2.png \
 		--add build/sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
-		$(TARGET).vpk
+		$(APPNAME).vpk
 
 %.velf: %.elf
 	cp $< $<.unstripped.elf
 	$(PREFIX)-strip -g $<
 	vita-elf-create $< $@
-	vita-make-fself -s $@ eboot.bin
 
-$(TARGET).elf: $(OBJS)
+xash.elf: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 clean:
 	$(MAKE) -C mainui clean
+	$(MAKE) -C modselector clean
 	$(MAKE) -C hlsdk/cl_dll clean
 	$(MAKE) -C hlsdk/dlls clean
-	@rm -rf libxashmenu.a libclient.a libserver.a
-	@rm -rf build/eboot.bin build/sce_sys/param.sfo param.sfo *.vpk.*
-	@rm -rf $(TARGET).velf $(TARGET).elf $(OBJS)
+	@rm -rf libxashmenu.a libclient.a libserver.a launcher.bin
+	@rm -rf build/eboot.bin build/xash.bin build/sce_sys/param.sfo param.sfo *.vpk.*
+	@rm -rf xash.velf xash.elf $(OBJS)

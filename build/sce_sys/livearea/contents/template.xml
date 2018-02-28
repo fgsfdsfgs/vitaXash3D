@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<livearea style="a4" format-ver="01.03" content-rev="1">
+<livearea style="psmobile" format-ver="01.03" content-rev="1">
 	<livearea-background>
 		<image>bg.png</image>
 	</livearea-background>
@@ -8,11 +8,4 @@
 	<gate>
 		<startup-image>startup.png</startup-image>
 	</gate>
-
-	<frame id='frame2' multi='o' autoflip='3' >
-		<liveitem>
-			<target>psla:-log</target>
-			<image>frame2.png</image>
-		</liveitem>
-	</frame>
 </livearea>

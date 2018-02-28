@@ -61,8 +61,8 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 
 #ifdef __vita__
 unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
-static char *vita_argv[] = { "xash3d", NULL, NULL, NULL };
-static int vita_argc = 1;
+static int vita_argc = 0;
+static char **vita_argv = NULL;
 
 int xash_main( unsigned int argc, void *argv );
 
@@ -81,33 +81,19 @@ int main( int argc, char **argv )
 	sceIoMkdir( "ux0:/data/xash3d/valve", 0775 );
 	sceIoMkdir( "ux0:/data/xash3d/valve/save", 0775 ); // crashes without this dir
 
-	// inject command line from livearea buttons
-	SceAppUtilAppEventParam eventParam;
-	memset( &eventParam, 0, sizeof(SceAppUtilAppEventParam) );
-	sceAppUtilReceiveAppEvent( &eventParam );
-	if( eventParam.type == 0x05 )
-	{
-		char buffer[2048] = { 0 };
-		sceAppUtilAppEventParseLiveArea( &eventParam, buffer );
-		if( !strncmp( buffer, "-log", 4 ) )
-		{
-			vita_argv[1] = "-log";
-			vita_argv[2] = "-dev";
-			vita_argv[3] = "5";
-			vita_argc = 4;
-		}
-	} 
+	vita_argc = argc;
+	vita_argv = argv;
 
 	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x800000, 0, 0, NULL );
 	if( main_thread >= 0 )
 	{
-		sceKernelStartThread(main_thread, 0, NULL);
-		sceKernelWaitThreadEnd(main_thread, NULL, NULL);
+		sceKernelStartThread( main_thread, 0, NULL );
+		sceKernelWaitThreadEnd( main_thread, NULL, NULL );
 	}
 	return 0;
 }
 
-int xash_main( unsigned int argc, void *argv )
+int xash_main( unsigned int argsize, void *arg )
 #else
 int main( int argc, char** argv )
 #endif
@@ -151,7 +137,12 @@ int main( int argc, char** argv )
 		IOS_LaunchDialog();
 	}
 #endif
+#ifdef __vita__
+	// can't change game after init on the vita
+	return Host_Main( g_iArgc, g_pszArgv, gamedir, 0, NULL );
+#else
 	return Host_Main( g_iArgc, g_pszArgv, gamedir, 0, &Launcher_ChangeGame );
+#endif
 }
 
 #endif

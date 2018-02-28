@@ -357,7 +357,7 @@ void Sys_ParseCommandLine( int argc, const char** argv )
 	for( i = 0; i < host.argc; i++ )
 	{
 		// we don't want to return to first game
-			 if( !Q_stricmp( "-game", host.argv[i] )) host.argv[i] = (char *)blank;
+		if( !Q_stricmp( "-game", host.argv[i] )) host.argv[i] = (char *)blank;
 		// probably it's timewaster, because engine rejected second change
 		else if( !Q_stricmp( "+game", host.argv[i] )) host.argv[i] = (char *)blank;
 		// you sure that map exists in new game?
