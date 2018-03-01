@@ -1,4 +1,4 @@
-LIBS = -lvita2d -lSceAppmgr_stub -lSceDisplay_stub -lSceGxm_stub \
+LIBS = -lvita2d -lSceAppMgr_stub -lSceDisplay_stub -lSceGxm_stub \
        -lSceSysmodule_stub -lSceCtrl_stub -lm \
        -lScePgf_stub -ljpeg -lfreetype -lc \
        -lSceCommonDialog_stub -lpng16 -lz
