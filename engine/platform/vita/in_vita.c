@@ -109,20 +109,6 @@ static inline void UpdateAxes( void )
 
 static inline void UpdateButtons( void )
 {
-		for( int i = 1; i < 16; i++ )
-			Joy_ButtonEvent( 0, i, (pad.buttons & (1 << i)) );
-}
-
-static inline void UpdateDPad( void )
-{
-/*
-	uint8_t hat = JOY_HAT_CENTERED;
-	hat |= pad.left && JOY_HAT_LEFT;
-	hat |= pad.right && JOY_HAT_RIGHT;
-	hat |= pad.up && JOY_HAT_UP;
-	hat |= pad.down && JOY_HAT_DOWN;
-	Joy_HatMotionEvent( 0, 0, hat );
-*/
 	if( cls.key_dest == key_console && ( pad.buttons & SCE_CTRL_LTRIGGER ) )
 	{
 		Vita_IN_OpenKeyboard( input_concmd, sizeof(input_concmd) );
@@ -179,7 +165,7 @@ void Vita_IN_OpenKeyboard( char *target, int target_sz )
 
 void Vita_IN_Init( void )
 {
-
+	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG_WIDE );
 }
 
 void Vita_IN_Frame( void )
@@ -193,7 +179,6 @@ void Vita_IN_Frame( void )
 	}
 	else
 	{
-		UpdateDPad( );
 		UpdateButtons( );
 		UpdateAxes( );
 	}

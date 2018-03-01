@@ -551,6 +551,9 @@ IN_Init
 */
 void IN_Init( void )
 {
+#ifdef __vita__
+	Vita_IN_Init( );
+#endif
 	IN_StartupMouse( );
 
 	cl_forwardspeed	= Cvar_Get( "cl_forwardspeed", "400", CVAR_ARCHIVE | CVAR_CLIENTDLL, "Default forward move speed" );

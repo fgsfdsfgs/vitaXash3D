@@ -75,7 +75,6 @@ int main( int argc, char **argv )
 	scePowerSetGpuClockFrequency( 222 );
 	scePowerSetGpuXbarClockFrequency( 166 );
 	sceSysmoduleLoadModule( SCE_SYSMODULE_NET );
-	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG_WIDE );
 
 	sceIoMkdir( "ux0:/data/xash3d", 0775 );
 	sceIoMkdir( "ux0:/data/xash3d/valve", 0775 );
