@@ -28,6 +28,14 @@ static int vita_deadzone_l = 30;
 static int vita_deadzone_r = 30;
 static SceCtrlData pad, pad_old;
 
+static SceTouchData touch_front, touch_back;
+
+static int backtouch_key = K_ALT;
+static int backtouch, backtouch_old;
+
+static qboolean fronttouch;
+static float fronttouch_x, fronttouch_y;
+
 qboolean vita_keyboard_on = false;
 static char input_concmd[128];
 static uint16_t input_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
@@ -121,6 +129,39 @@ static inline void UpdateButtons( void )
 	}
 }
 
+static inline void UpdateTouch( void )
+{
+	// use front touchpanel as a regular touch device
+	if( touch_front.reportNum > 0 )
+	{
+		float x = touch_front.report[0].x / 1980.f;
+		float y = touch_front.report[0].y / 1088.f;
+		if( fronttouch )
+		{
+			float dx = x - fronttouch_x;
+			float dy = y - fronttouch_y;
+			IN_TouchEvent( event_motion, 0, x, y, dx, dy );
+		}
+		else
+		{
+			IN_TouchEvent( event_down, 0, x, y, 0.f, 0.f );
+			fronttouch = true;
+		}
+		fronttouch_x = x;
+		fronttouch_y = y;
+	}
+	else if( fronttouch )
+	{
+		IN_TouchEvent( event_up, 0, fronttouch_x, fronttouch_y, 0.f, 0.f );
+		fronttouch = false;
+	}
+
+	// use back touchpanel as a button
+	backtouch = ( touch_back.reportNum > 0 );
+	if( backtouch != backtouch_old )
+		Key_Event( backtouch_key, backtouch );
+}
+
 static inline void UpdateKeyboard( void )
 {
 	static SceImeDialogResult result;
@@ -166,13 +207,20 @@ void Vita_IN_OpenKeyboard( char *target, int target_sz )
 void Vita_IN_Init( void )
 {
 	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG_WIDE );
+	sceTouchSetSamplingState( SCE_TOUCH_PORT_FRONT, 1 );
+	sceTouchSetSamplingState( SCE_TOUCH_PORT_BACK, 1 );
 }
 
 void Vita_IN_Frame( void )
 {
 	pad_old = pad;
-	sceKernelPowerTick(0);
+	backtouch_old = backtouch;
+
+	sceKernelPowerTick( 0 );
 	sceCtrlPeekBufferPositive( 0, &pad, 1 );
+	sceTouchPeek( SCE_TOUCH_PORT_FRONT, &touch_front, 1 );
+	sceTouchPeek( SCE_TOUCH_PORT_BACK, &touch_back, 1 );
+
 	if( vita_keyboard_on )
 	{
 		UpdateKeyboard( );
@@ -181,6 +229,7 @@ void Vita_IN_Frame( void )
 	{
 		UpdateButtons( );
 		UpdateAxes( );
+		UpdateTouch( );
 	}
 }
 
