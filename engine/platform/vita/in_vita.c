@@ -30,7 +30,7 @@ static SceCtrlData pad, pad_old;
 
 static SceTouchData touch_front, touch_back;
 
-static int backtouch_key = K_ALT;
+static int backtouch_key = K_MOUSE2;
 static int backtouch, backtouch_old;
 
 static qboolean fronttouch;
@@ -62,8 +62,8 @@ static buttonmapping_t btnmap[12] =
 	{ SCE_CTRL_RIGHT, K_RIGHTARROW },
 	{ SCE_CTRL_DOWN, K_DOWNARROW },
 	{ SCE_CTRL_LEFT, K_LEFTARROW },
-	{ SCE_CTRL_LTRIGGER, K_MOUSE1 },
-	{ SCE_CTRL_RTRIGGER, K_MOUSE2 },
+	{ SCE_CTRL_LTRIGGER, K_ALT },
+	{ SCE_CTRL_RTRIGGER, K_CTRL },
 	{ SCE_CTRL_TRIANGLE, K_SHIFT },
 	{ SCE_CTRL_CIRCLE, K_BACKSPACE },
 	{ SCE_CTRL_CROSS, K_ENTER },
