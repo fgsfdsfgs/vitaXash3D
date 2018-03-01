@@ -60,7 +60,7 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 #endif
 
 #ifdef __vita__
-unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
+unsigned int _newlib_heap_size_user = 96 * 1024 * 1024;
 static int vita_argc = 0;
 static char **vita_argv = NULL;
 
@@ -75,7 +75,7 @@ int main( int argc, char **argv )
 	scePowerSetGpuClockFrequency( 222 );
 	scePowerSetGpuXbarClockFrequency( 166 );
 	sceSysmoduleLoadModule( SCE_SYSMODULE_NET );
-	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG );
+	sceCtrlSetSamplingMode( SCE_CTRL_MODE_ANALOG_WIDE );
 
 	sceIoMkdir( "ux0:/data/xash3d", 0775 );
 	sceIoMkdir( "ux0:/data/xash3d/valve", 0775 );
