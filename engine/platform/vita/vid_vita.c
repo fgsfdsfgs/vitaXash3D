@@ -21,10 +21,10 @@ GNU General Public License for more details.
 #include "input.h"
 #include "gl_vidnt.h"
 
-uint16_t *gl_vgl_indices = NULL;
-float *gl_vgl_verts = NULL;
-float *gl_vgl_texcoords = NULL;
-float *gl_vgl_colors = NULL;
+float gl_vgl_verts[MAX_VGL_ARRAYSIZE*3] = { 0.f };
+float gl_vgl_texcoords[MAX_VGL_ARRAYSIZE*2] = { 0.f };
+float gl_vgl_colors[MAX_VGL_ARRAYSIZE*4] = { 0.f };
+uint16_t gl_vgl_indices[MAX_VGL_ARRAYSIZE];
 
 typedef enum
 {
@@ -344,12 +344,7 @@ qboolean R_Init_OpenGL( void )
 	VID_StartupGamma();
 	MsgDev( D_NOTE, "R_Init_OpenGL()\n");
 
-	gl_vgl_indices = malloc( sizeof( uint16_t ) * MAX_VGL_ARRAYSIZE );
 	for( uint16_t i = 0; i < MAX_VGL_ARRAYSIZE; ++i ) gl_vgl_indices[i] = i;
-
-	gl_vgl_verts = calloc( MAX_VGL_ARRAYSIZE * 3, sizeof( GLfloat ) );
-	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );
-	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
 	vglInit( 0x2000000 );
 	vglUseVram( GL_TRUE );
