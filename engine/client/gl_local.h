@@ -28,10 +28,10 @@ GNU General Public License for more details.
 #define MAX_VGL_ARRAYSIZE 256 // TODO: is this too much or too little?
 extern void vitaBeginFrame( void );
 extern void vitaEndFrame( void );
-extern float gl_vgl_verts[MAX_VGL_ARRAYSIZE*3];
-extern float gl_vgl_texcoords[MAX_VGL_ARRAYSIZE*2];
-extern float gl_vgl_colors[MAX_VGL_ARRAYSIZE*4];
-extern uint16_t gl_vgl_indices[MAX_VGL_ARRAYSIZE];
+extern float *gl_vgl_verts;
+extern float *gl_vgl_texcoords;
+extern float *gl_vgl_colors;
+extern uint16_t *gl_vgl_indices;
 #endif
 #include "com_model.h"
 #include "cl_entity.h"
