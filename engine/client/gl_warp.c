@@ -648,13 +648,18 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 
 		for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
 		{
+#ifndef __vita__ // TODO: re-enable this when renderer is fast enough
 			if( waveHeight )
 			{
 				nv = r_turbsin[(int)(cl.time * 160.0f + v[1] + v[0]) & 255] + 8.0f;
 				nv = (r_turbsin[(int)(v[0] * 5.0f + cl.time * 171.0f - v[1]) & 255] + 8.0f ) * 0.8f + nv;
 				nv = nv * waveHeight + v[2];
 			}
-			else nv = v[2];
+			else
+#endif
+			{
+				nv = v[2];
+			}
 
 			os = v[3];
 			ot = v[4];

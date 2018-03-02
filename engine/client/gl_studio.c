@@ -2338,13 +2338,13 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				color24	*clr;
 				clr = &RI.currententity->curstate.rendercolor;
 #ifdef __vita__
-					cl[0] = clr->r;
-					cl[1] = clr->g;
-					cl[2] = clr->b;
+				cl[0] = clr->r;
+				cl[1] = clr->g;
+				cl[2] = clr->b;
 #else
-					cl[0] = clr->r * 255;
-					cl[1] = clr->g * 255;
-					cl[2] = clr->b * 255;
+				cl[0] = clr->r * 255;
+				cl[1] = clr->g * 255;
+				cl[2] = clr->b * 255;
 #endif
 				cl[3] = alpha;
 			}
@@ -2390,7 +2390,6 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	pglDisableClientState( GL_COLOR_ARRAY );
-	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices ); // HACK: restore index pointer
 }
 
 /*
@@ -3728,6 +3727,9 @@ R_DrawStudioModel
 void R_DrawStudioModel( cl_entity_t *e )
 {
 	R_DrawStudioModelInternal( e, false );
+#ifdef __vita__
+	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices ); // HACK: restore index pointer
+#endif
 }
 
 /*

@@ -768,15 +768,18 @@ void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 	float *vertp = gl_vgl_verts;
 	float *uvp = gl_vgl_texcoords;
 
-	for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
-	{
-		if( hasScale )
-			{ *(uvp++) = ( v[3] + sOffset ) * xScale; *(uvp++) = ( v[4] + tOffset ) * yScale; }
-		else
-			{ *(uvp++) = v[3] + sOffset; *(uvp++) = v[4] + tOffset; }
-
-		*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
-	}
+	if( hasScale )
+		for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
+		{
+			*(uvp++) = ( v[3] + sOffset ) * xScale; *(uvp++) = ( v[4] + tOffset ) * yScale;
+			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
+		}
+	else
+		for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
+		{
+			*(uvp++) = v[3] + sOffset; *(uvp++) = v[4] + tOffset;
+			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
+		}
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
@@ -822,28 +825,49 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 #ifdef __vita__
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-#endif
+
+	float	*v;
+	int	i;
+
+	if( dynamic )
+		for( ; p != NULL; p = p->chain )
+		{
+			float *vertp = gl_vgl_verts;
+			float *uvp = gl_vgl_texcoords;
+			v = p->verts[0];
+			for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
+			{
+				*(uvp++) = v[5] - soffset; *(uvp++) = v[6] - toffset;
+				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
+			}
+			vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+			vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+			vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+		}
+	else
+		for( ; p != NULL; p = p->chain )
+		{
+			float *vertp = gl_vgl_verts;
+			float *uvp = gl_vgl_texcoords;
+			v = p->verts[0];
+			for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
+			{
+				*(uvp++) = v[5]; *(uvp++) = v[6];
+				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
+			}
+			vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+			vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+			vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+		}
+
+	pglDisableClientState( GL_VERTEX_ARRAY );
+	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+#else
 	for( ; p != NULL; p = p->chain )
 	{
 		float	*v;
 		int	i;
 
-#ifdef __vita__
-		float *vertp = gl_vgl_verts;
-		float *uvp = gl_vgl_texcoords;
-
-		v = p->verts[0];
-		for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
-		{
-			if( !dynamic ) { *(uvp++) = v[5]; *(uvp++) = v[6]; }
-			else { *(uvp++) = v[5] - soffset; *(uvp++) = v[6] - toffset; }
-			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
-		}
-
-		vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-		vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-		vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
-#else
 		pglBegin( GL_POLYGON );
 		v = p->verts[0];
 		for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
@@ -853,11 +877,7 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 			pglVertex3fv( v );
 		}
 		pglEnd ();
-#endif
 	}
-#ifdef __vita__
-	pglDisableClientState( GL_VERTEX_ARRAY );
-	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #endif
 }
 
