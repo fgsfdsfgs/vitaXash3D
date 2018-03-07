@@ -83,7 +83,7 @@ int main( int argc, char **argv )
 	vita_argc = argc;
 	vita_argv = argv;
 
-	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x800000, 0, 0, NULL );
+	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x100000, 0, 0, NULL );
 	if( main_thread >= 0 )
 	{
 		sceKernelStartThread( main_thread, 0, NULL );
