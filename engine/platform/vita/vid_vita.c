@@ -36,13 +36,13 @@ typedef enum
 
 extern qboolean vita_keyboard_on;
 
-void vitaBeginFrame( void )
+void Vita_BeginFrame( void )
 {
 	vglStartRendering( );
 	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices );
 }
 
-void vitaEndFrame( void )
+void Vita_EndFrame( void )
 {
 	if( vita_keyboard_on )
 	{
@@ -97,8 +97,8 @@ void GL_UpdateSwapInterval( void )
 	if( gl_swapInterval->modified )
 	{
 		gl_swapInterval->modified = false;
-    MsgDev( D_INFO, "GL_UpdateSwapInterval: %d\n", gl_swapInterval->integer );
-		//vglWaitVblankStart( gl_swapInterval->integer );
+		MsgDev( D_INFO, "GL_UpdateSwapInterval: %d\n", gl_swapInterval->integer );
+		// vglWaitVblankStart( gl_swapInterval->integer );
 	}
 }
 
@@ -356,6 +356,10 @@ qboolean R_Init_OpenGL( void )
 	vglUseVram( GL_TRUE );
 	vglWaitVblankStart( GL_TRUE );
 
+	Vita_ReloadShaders( );
+	Vita_EnableGLState( GL_ALPHA_TEST );
+	Vita_EnableGLState( GL_TEXTURE_COORD_ARRAY );
+
 	return VID_SetMode();
 }
 
@@ -369,11 +373,13 @@ void R_Free_OpenGL( void )
 {
 	MsgDev( D_NOTE, "R_Free_OpenGL()\n");
 
-	VID_RestoreGamma ();
+	VID_RestoreGamma( );
 
-	GL_DeleteContext ();
+	GL_DeleteContext( );
 
-	VID_DestroyWindow ();
+	VID_DestroyWindow( );
+
+	Vita_FreeShaders( );
 
 	vglEnd( );
 
@@ -408,6 +414,298 @@ void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei wi
 	glTexImage2D( target, level, internalformat, width, height, border, format, type, data );
 
 	if( data != pixels ) free( data );
+}
+
+/* SHADER STUFF */
+// mostly stolen from vitaQuake
+
+static GLuint fs[9];
+static GLuint vs[4];
+static GLuint programs[9];
+
+static qboolean just_color; // HACK
+
+static int state_mask = 0;
+static int texenv_mask = 0;
+static int texcoord_state = 0;
+static int alpha_state = 0;
+static int color_state = 0;
+static float cur_color[4];
+GLint u_monocolor;
+GLint u_modcolor[2];
+
+static qboolean shaders_loaded;
+static qboolean shaders_reload;
+
+static void *LoadShader( const char* filename, GLuint idx, GLboolean fragment )
+{
+	FILE* f = fopen( filename, "rb" );
+	fseek( f, 0, SEEK_END );
+	long int size = ftell( f );
+	fseek( f, 0, SEEK_SET );
+	void* res = malloc( size );
+	fread( res, 1, size, f );
+	fclose( f );
+	if( fragment ) { fs[idx] = glCreateShader( GL_FRAGMENT_SHADER ); glShaderBinary( 1, &fs[idx], 0, res, size ); }
+	else { vs[idx] = glCreateShader( GL_VERTEX_SHADER ); glShaderBinary( 1, &vs[idx], 0, res, size ); }
+	free( res );
+}
+
+static inline void LinkShader( GLuint pidx, GLuint fidx, GLuint vidx, GLboolean texcoord, GLboolean color )
+{
+	programs[pidx] = glCreateProgram( );
+	glAttachShader( programs[pidx], fs[fidx] );
+	glAttachShader( programs[pidx], vs[vidx] );
+	vglBindAttribLocation( programs[pidx], 0, "aPosition", 3, GL_FLOAT );
+	if( texcoord ) vglBindAttribLocation( programs[pidx], 1, "aTexCoord", 2, GL_FLOAT );
+	if( color ) vglBindAttribLocation( programs[pidx], 2, "aColor", 4, GL_FLOAT );
+	glLinkProgram( programs[pidx] );
+}
+
+void Vita_FreeShaders( void )
+{
+	if( shaders_loaded )
+	{
+		for( int i = 0; i < 9; i++ )
+			glDeleteProgram( programs[i] );
+		for( int i = 0; i < 9; i++ )
+			glDeleteShader( fs[i] );
+		for( int i = 0; i < 4; i++ )
+			glDeleteShader( vs[i] );
+		shaders_loaded = false;
+	}
+}
+
+void Vita_ReloadShaders( void )
+{
+	glFinish( );
+	Vita_FreeShaders( );
+
+	LoadShader( "app0:shaders/modulate_f.gxp", VGL_SHADER_MODULATE, GL_TRUE );
+	LoadShader( "app0:shaders/modulate_rgba_f.gxp", VGL_SHADER_MODULATE_WITH_COLOR, GL_TRUE );
+	LoadShader( "app0:shaders/replace_f.gxp", VGL_SHADER_REPLACE, GL_TRUE );
+	LoadShader( "app0:shaders/modulate_alpha_f.gxp", VGL_SHADER_MODULATE_A, GL_TRUE );
+	LoadShader( "app0:shaders/modulate_rgba_alpha_f.gxp", VGL_SHADER_MODULATE_COLOR_A, GL_TRUE );
+	LoadShader( "app0:shaders/replace_alpha_f.gxp", VGL_SHADER_REPLACE_A, GL_TRUE );
+	LoadShader( "app0:shaders/texture2d_v.gxp", VGL_SHADER_TEXTURE2D, GL_FALSE );
+	LoadShader( "app0:shaders/texture2d_rgba_v.gxp", VGL_SHADER_TEXTURE2D_WITH_COLOR, GL_FALSE );
+	LoadShader( "app0:shaders/rgba_f.gxp", VGL_SHADER_RGBA_COLOR, GL_TRUE );
+	LoadShader( "app0:shaders/vertex_f.gxp", VGL_SHADER_MONO_COLOR, GL_TRUE );
+	LoadShader( "app0:shaders/rgba_alpha_f.gxp", VGL_SHADER_RGBA_A, GL_TRUE );
+	LoadShader( "app0:shaders/rgba_v.gxp", VGL_SHADER_COLOR, GL_FALSE );
+	LoadShader( "app0:shaders/vertex_v.gxp", VGL_SHADER_VERTEX_ONLY, GL_FALSE );
+
+	LinkShader( VGL_SHADER_TEX2D_REPL, VGL_SHADER_REPLACE, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
+	LinkShader( VGL_SHADER_TEX2D_MODUL, VGL_SHADER_MODULATE, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
+	LinkShader( VGL_SHADER_TEX2D_MODUL_CLR, VGL_SHADER_MODULATE_WITH_COLOR, VGL_SHADER_TEXTURE2D_WITH_COLOR, GL_TRUE, GL_TRUE );
+	LinkShader( VGL_SHADER_RGBA_COLOR, VGL_SHADER_RGBA_COLOR, VGL_SHADER_COLOR, GL_FALSE, GL_TRUE );
+	LinkShader( VGL_SHADER_NO_COLOR, VGL_SHADER_MONO_COLOR, VGL_SHADER_VERTEX_ONLY, GL_FALSE, GL_FALSE );
+	LinkShader( VGL_SHADER_TEX2D_REPL_A, VGL_SHADER_REPLACE_A, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
+	LinkShader( VGL_SHADER_TEX2D_MODUL_A, VGL_SHADER_MODULATE_A, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
+	LinkShader( VGL_SHADER_FULL_A, VGL_SHADER_MODULATE_COLOR_A, VGL_SHADER_TEXTURE2D_WITH_COLOR, GL_TRUE, GL_TRUE );
+	LinkShader( VGL_SHADER_RGBA_CLR_A, VGL_SHADER_RGBA_A, VGL_SHADER_COLOR, GL_FALSE, GL_TRUE );
+
+	u_modcolor[0] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL], "uColor" );
+	u_modcolor[1] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL_A], "uColor" );
+	u_monocolor = glGetUniformLocation( programs[VGL_SHADER_NO_COLOR], "uColor" );
+}
+
+void Vita_SetShader( void )
+{
+	just_color = false;
+	switch( state_mask + texenv_mask )
+	{
+		case 0x00: // Everything off
+		case 0x04: // Modulate
+		case 0x08: // Alpha Test
+		case 0x0C: // Alpha Test + Modulate
+			just_color = true;
+			glUseProgram( programs[VGL_SHADER_NO_COLOR] );
+			break;
+		case 0x01: // Texcoord
+		case 0x03: // Texcoord + Color
+			glUseProgram( programs[VGL_SHADER_TEX2D_REPL] );
+			break;
+		case 0x02: // Color
+		case 0x06: // Color + Modulate
+			glUseProgram( programs[VGL_SHADER_RGBA_COLOR] );
+			break;
+		case 0x05: // Modulate + Texcoord
+			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL] );
+			break;
+		case 0x07: // Modulate + Texcoord + Color
+			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL_CLR] );
+			break;
+		case 0x09: // Alpha Test + Texcoord
+		case 0x0B: // Alpha Test + Color + Texcoord
+			glUseProgram( programs[VGL_SHADER_TEX2D_REPL_A] );
+			break;
+		case 0x0A: // Alpha Test + Color
+		case 0x0E: // Alpha Test + Modulate + Color
+			glUseProgram( programs[VGL_SHADER_RGBA_CLR_A] );
+			break;
+		case 0x0D: // Alpha Test + Modulate + Texcoord
+			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL_A] );
+			break;
+		case 0x0F: // Alpha Test + Modulate + Texcoord + Color
+			glUseProgram( programs[VGL_SHADER_FULL_A] );
+			break;
+		default:
+			break;
+	}
+}
+
+void Vita_EnableGLState( int state )
+{
+	switch( state )
+	{
+		case GL_TEXTURE_COORD_ARRAY:
+			if( !texcoord_state )
+			{
+				state_mask += 0x01;
+				texcoord_state = 1;
+			}
+			break;
+		case GL_COLOR_ARRAY:
+			if( !color_state )
+			{
+				state_mask += 0x02;
+				color_state = 1;
+			}
+			break;
+		case GL_MODULATE:
+			texenv_mask = 0x04;
+			break;
+		case GL_REPLACE:
+			texenv_mask = 0;
+			break;
+		case GL_ALPHA_TEST:
+			if( !alpha_state )
+			{
+				state_mask += 0x08;
+				alpha_state = 1;
+			} 
+			break;
+		default: return;
+	}
+	Vita_SetShader( );
+}
+
+void Vita_DisableGLState( int state )
+{
+	switch( state )
+	{
+		case GL_TEXTURE_COORD_ARRAY:
+			if( texcoord_state )
+			{
+				state_mask -= 0x01;
+				texcoord_state = 0;
+			}
+			break;
+		case GL_COLOR_ARRAY:
+			if( color_state )
+			{
+				state_mask -= 0x02;
+				color_state = 0;
+			}
+			break;
+		case GL_ALPHA_TEST:
+			if( alpha_state )
+			{
+				state_mask -= 0x08;
+				alpha_state = 0;
+			} 
+			break;
+		default: return;
+	}
+	Vita_SetShader( );
+}
+
+void Vita_DrawGLPoly( GLenum prim, int num, GLboolean implicit_wvp )
+{
+	if( (state_mask + texenv_mask) == 0x05 ) glUniform4fv( u_modcolor[0], 1, cur_color );
+	else if( (state_mask + texenv_mask) == 0x0D ) glUniform4fv( u_modcolor[1], 1, cur_color );
+	else if( just_color ) glUniform4fv( u_monocolor, 1, cur_color );
+	vglDrawObjects( prim, num, implicit_wvp );
+}
+
+void Vita_VertexPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 0, count, type, GL_FALSE, 0, num, ptr );
+}
+
+void Vita_TexCoordPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 1, count, type, GL_FALSE, 0, num, ptr );
+}
+
+void Vita_ColorPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 2, count, type, GL_FALSE, 0, num, ptr );
+}
+
+// HACKHACKHACK: GL function wrappers to go with this shit
+
+void pglColor3f( float r, float g, float b )
+{
+	cur_color[0] = r;
+	cur_color[1] = g;
+	cur_color[2] = b;
+	cur_color[3] = 1.f;
+}
+
+void pglColor4f( float r, float g, float b, float a )
+{
+	cur_color[0] = r;
+	cur_color[1] = g;
+	cur_color[2] = b;
+	cur_color[3] = a;
+}
+
+void pglColor4ub( uint8_t r, uint8_t g, uint8_t b, uint8_t a )
+{
+	cur_color[0] = r / 255.f;
+	cur_color[1] = g / 255.f;
+	cur_color[2] = b / 255.f;
+	cur_color[3] = a / 255.f;
+}
+
+void pglColor4ubv( uint8_t *v )
+{
+	cur_color[0] = *(v++) / 255.f;
+	cur_color[1] = *(v++) / 255.f;
+	cur_color[2] = *(v++) / 255.f;
+	cur_color[3] = *(v  ) / 255.f;
+}
+
+void pglTexEnvi( GLenum target, GLenum pname, GLint param )
+{
+	if( param == GL_MODULATE || param == GL_REPLACE ) Vita_EnableGLState( param );
+	else glTexEnvi( target, pname, param );
+}
+
+void pglEnable( GLenum param )
+{
+	if( param == GL_ALPHA_TEST || param == GL_TEXTURE_2D ) Vita_EnableGLState( param );
+	else glEnable( param );
+}
+
+void pglDisable( GLenum param )
+{
+	if( param == GL_ALPHA_TEST || param == GL_TEXTURE_2D ) Vita_DisableGLState( param );
+	else glDisable( param );
+}
+
+void pglEnableClientState( GLenum param )
+{
+	if( param == GL_COLOR_ARRAY || param == GL_TEXTURE_COORD_ARRAY || param == GL_VERTEX_ARRAY ) Vita_EnableGLState( param );
+	else glEnableClientState( param );
+}
+
+void pglDisableClientState( GLenum param )
+{
+	if( param == GL_COLOR_ARRAY || param == GL_TEXTURE_COORD_ARRAY || param == GL_VERTEX_ARRAY ) Vita_DisableGLState( param );
+	else glDisableClientState( param );
 }
 
 #endif // XASH_VIDEO

@@ -1,0 +1,9 @@
+﻿float4 main(
+	float2 vTexCoord : TEXCOORD0,
+	uniform sampler2D uTex
+	)
+{	
+	float4 c = tex2D(uTex, vTexCoord);
+	if (c.a >= 0.5) return c;
+	else discard;
+}

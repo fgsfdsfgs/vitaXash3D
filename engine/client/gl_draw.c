@@ -75,9 +75,9 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 	float uvs[] = { s1, t1,  s2, t1,  s2, t2,  s1, t2 };
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-	vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+	Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else
@@ -123,9 +123,9 @@ void R_DrawTileClear( int x, int y, int w, int h )
 	float uvs[] = { x/tw, y/th,  (x+w)/tw, y/th,  (x+w)/tw, (y+h)/th,  x/tw, (y+h)/th };
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-	vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+	Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else
@@ -206,9 +206,9 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 	float uvs[] = { 0, 0,  1, 0,  1, 1,  0, 1 };
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-	vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+	Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else

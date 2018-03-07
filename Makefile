@@ -19,8 +19,6 @@ C_CLIENT = $(wildcard engine/client/*.c)
 C_SERVER = $(wildcard engine/server/*.c)
 C_SYSTEM = $(wildcard engine/platform/vita/*.c)
 
-# GAME =
-
 CFILES   := $(C_SYSTEM) $(C_COMMON) $(C_SERVER) $(C_CLIENT)
 # CPPFILES := $(CXX_MENU)
 OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)
@@ -54,6 +52,9 @@ libserver.a:
 	$(MAKE) -C hlsdk/dlls clean
 	$(MAKE) -C hlsdk/dlls
 
+shaders:
+	$(MAKE) -C shaders
+
 $(APPNAME).vpk: xash.velf launcher.bin
 	vita-make-fself -s $< build/xash.bin
 	cp -f launcher.bin build/eboot.bin
@@ -66,6 +67,19 @@ $(APPNAME).vpk: xash.velf launcher.bin
 		--add build/sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
 		--add build/sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
 		--add build/sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
+		--add build/shaders/modulate_alpha_f.gxp=shaders/modulate_alpha_f.gxp \
+		--add build/shaders/modulate_f.gxp=shaders/modulate_f.gxp \
+		--add build/shaders/modulate_rgba_alpha_f.gxp=shaders/modulate_rgba_alpha_f.gxp \
+		--add build/shaders/modulate_rgba_f.gxp=shaders/modulate_rgba_f.gxp \
+		--add build/shaders/replace_alpha_f.gxp=shaders/replace_alpha_f.gxp \
+		--add build/shaders/replace_f.gxp=shaders/replace_f.gxp \
+		--add build/shaders/rgba_alpha_f.gxp=shaders/rgba_alpha_f.gxp \
+		--add build/shaders/rgba_f.gxp=shaders/rgba_f.gxp \
+		--add build/shaders/rgba_v.gxp=shaders/rgba_v.gxp \
+		--add build/shaders/texture2d_rgba_v.gxp=shaders/texture2d_rgba_v.gxp \
+		--add build/shaders/texture2d_v.gxp=shaders/texture2d_v.gxp \
+		--add build/shaders/vertex_f.gxp=shaders/vertex_f.gxp \
+		--add build/shaders/vertex_v.gxp=shaders/vertex_v.gxp \
 		$(APPNAME).vpk
 
 %.velf: %.elf

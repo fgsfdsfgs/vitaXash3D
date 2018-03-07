@@ -1,7 +1,6 @@
 /*
 gl_stubs.h - opengl func stubs and defs for shit that's not supported by vitaGL
 keep an eye on this in case these get implemented in vitaGL for real
-last modified: 14/02/2018 0250 UTC+3
  */
 
 #ifndef GL_STUBS_H
@@ -181,15 +180,24 @@ static inline void glClipPlane( GLenum plane, GLdouble *data ) { }
 static inline void glShadeModel( GLenum model ) { }
 static inline void glTexGeni( GLenum coord, GLenum pname, GLint param ) { }
 static inline void glPixelStorei( GLenum opt, GLint val ) { }
-static inline GLboolean glIsTexture( GLenum obj ) { return obj >= 0 && obj < 1024; }
+static inline GLboolean glIsTexture( GLenum obj ) { return obj >= 0 && obj < 2000; }
 static inline void glPointSize( GLfloat size ) { }
 static inline void glLineWidth( GLfloat w ) { }
 static inline void glNormal3fv( GLfloat *v ) { }
 
 static inline void glTexParameterfv( GLenum targ, GLenum opt, GLfloat *params ) { glTexParameterf( targ, opt, params[0] ); }
 
-// wrapper, defined in vid_vita.c
+// wrappers, defined in vid_vita.c
 void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels );
+void pglColor3f( float r, float g, float b );
+void pglColor4f( float r, float g, float b, float a );
+void pglColor4ub( uint8_t r, uint8_t g, uint8_t b, uint8_t a );
+void pglColor4ubv( uint8_t *v );
+void pglTexEnvi( GLenum target, GLenum pname, GLint param );
+void pglEnable( GLenum param );
+void pglDisable( GLenum param );
+void pglEnableClientState( GLenum param );
+void pglDisableClientState( GLenum param );
 
 static inline void glTexImage1D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {

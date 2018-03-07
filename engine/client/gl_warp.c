@@ -422,9 +422,9 @@ void R_DrawSkyBox( void )
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMaxs[1][i], i, verts[1], uvs[1] );
 		MakeSkyVec( RI.skyMaxs[0][i], RI.skyMaxs[1][i], i, verts[2], uvs[2] );
 		MakeSkyVec( RI.skyMaxs[0][i], RI.skyMins[1][i], i, verts[3], uvs[3] );
-		vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-		vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-		vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+		Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+		Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+		Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 #else
 		pglBegin( GL_QUADS );
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMins[1][i], i );
@@ -675,9 +675,9 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
 		}
 
-		vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-		vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-		vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+		Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+		Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+		Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
 #else
 			if( glState.activeTMU != 0 )
 				GL_MultiTexCoord2f( glState.activeTMU, s, t );
@@ -745,9 +745,9 @@ void EmitSkyPolys( msurface_t *fa )
 			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
 		}
 
-		vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-		vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-		vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+		Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+		Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+		Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
 	}
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );

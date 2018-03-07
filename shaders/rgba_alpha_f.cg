@@ -1,0 +1,5 @@
+float4 main(float4 vColor : COLOR) : COLOR
+{
+	if (vColor.a >= 0.5) return vColor;
+	else discard;
+}

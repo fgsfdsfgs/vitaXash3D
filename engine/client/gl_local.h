@@ -23,15 +23,7 @@ GNU General Public License for more details.
 #include "gl_export.h"
 #else
 #include <vitaGL.h>
-#include "../platform/vita/gl_stubs.h"
-#include "../platform/vita/gl_mangle.h"
-#define MAX_VGL_ARRAYSIZE 256 // TODO: is this too much or too little?
-extern void vitaBeginFrame( void );
-extern void vitaEndFrame( void );
-extern float *gl_vgl_verts;
-extern float *gl_vgl_texcoords;
-extern float *gl_vgl_colors;
-extern uint16_t *gl_vgl_indices;
+#include "../platform/vita/vid_vita.h"
 #endif
 #include "com_model.h"
 #include "cl_entity.h"

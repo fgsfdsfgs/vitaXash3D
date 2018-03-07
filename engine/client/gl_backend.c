@@ -57,7 +57,7 @@ void GL_BackendStartFrame( void )
 	if( !RI.drawWorld ) R_Set2DMode( false );
 //#ifdef __vita__
 //	// HACK: couldn't figure out where to put these, so put em everywhere
-//	vitaBeginFrame( );
+//	Vita_BeginFrame( );
 //#endif
 }
 
@@ -70,7 +70,7 @@ void GL_BackendEndFrame( void )
 {
 //#ifdef __vita__
 //	// HACK: couldn't figure out where to put these, so put em everywhere
-//	vitaEndFrame( );
+//	Vita_EndFrame( );
 //#endif
 	// go into 2D mode (in case we draw PlayerSetup between two 2d calls)
 	if( !RI.drawWorld ) R_Set2DMode( true );
@@ -726,9 +726,9 @@ rebuild_page:
 		float uvs[] = { 0.f, 0.f,  1.f, 0.f,  1.f, 1.f,  0.f, 1.f };
 		pglEnableClientState( GL_VERTEX_ARRAY );
 		pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-		vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-		vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-		vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+		Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+		Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+		Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 		pglDisableClientState( GL_VERTEX_ARRAY );
 		pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else

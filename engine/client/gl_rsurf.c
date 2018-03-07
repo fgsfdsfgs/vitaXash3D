@@ -783,9 +783,9 @@ void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-	vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+	Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else
@@ -840,9 +840,9 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 				*(uvp++) = v[5] - soffset; *(uvp++) = v[6] - toffset;
 				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
 			}
-			vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-			vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-			vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+			Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+			Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+			Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
 		}
 	else
 		for( ; p != NULL; p = p->chain )
@@ -855,9 +855,9 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 				*(uvp++) = v[5]; *(uvp++) = v[6];
 				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
 			}
-			vglVertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-			vglTexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-			vglDrawObjects( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+			Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+			Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+			Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
 		}
 
 	pglDisableClientState( GL_VERTEX_ARRAY );

@@ -3076,18 +3076,18 @@ void GAME_EXPORT TriEnd( void )
 	if( tri_numverts && tri_vertp != gl_vgl_verts )
 	{
 		pglEnableClientState( GL_VERTEX_ARRAY );
-		vglVertexPointer( 3, GL_FLOAT, 0, tri_numverts, gl_vgl_verts );
+		Vita_VertexPointer( 3, GL_FLOAT, 0, tri_numverts, gl_vgl_verts );
 		if( tri_texp != gl_vgl_texcoords )
 		{
 			pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-			vglTexCoordPointer( 2, GL_FLOAT, 0, tri_numverts, gl_vgl_texcoords );
+			Vita_TexCoordPointer( 2, GL_FLOAT, 0, tri_numverts, gl_vgl_texcoords );
 		}
 		if( tri_colorp != gl_vgl_colors )
 		{
 			pglEnableClientState( GL_COLOR_ARRAY );
-			vglColorPointer( 4, GL_FLOAT, 0, tri_numverts, gl_vgl_colors );
+			Vita_ColorPointer( 4, GL_FLOAT, 0, tri_numverts, gl_vgl_colors );
 		}
-		vglDrawObjects( tri_mode, tri_numverts, GL_TRUE );
+		Vita_DrawGLPoly( tri_mode, tri_numverts, GL_TRUE );
 		pglDisableClientState( GL_VERTEX_ARRAY );
 		pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 		pglDisableClientState( GL_COLOR_ARRAY );

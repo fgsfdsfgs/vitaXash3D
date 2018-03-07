@@ -2370,10 +2370,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 #ifdef __vita__
 	vglIndexPointer( GL_SHORT, 0, g_nNumArrayElems, g_xarrayelems );
-	vglVertexPointer( 3, GL_FLOAT, 0, g_nNumArrayVerts, g_xarrayverts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycoord );
-	vglColorPointer( 4, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycolor );
-	vglDrawObjects( GL_TRIANGLES, g_nNumArrayElems, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, g_nNumArrayVerts, g_xarrayverts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycoord );
+	Vita_ColorPointer( 4, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycolor );
+	Vita_DrawGLPoly( GL_TRIANGLES, g_nNumArrayElems, GL_TRUE );
 #else
 	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
 	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );

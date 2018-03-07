@@ -1273,8 +1273,7 @@ void R_BeginFrame( qboolean clearScene )
 
 	CL_ExtraUpdate ();
 #ifdef __vita__
-	// HACK: couldn't figure out where to put these, so put em everywhere
-	vitaBeginFrame( );
+	Vita_BeginFrame( );
 #endif
 }
 
@@ -1350,8 +1349,7 @@ R_EndFrame
 void R_EndFrame( void )
 {
 #ifdef __vita__
-	// HACK: couldn't figure out where to put these, so put em everywhere
-	vitaEndFrame( );
+	Vita_EndFrame( );
 #endif
 	// flush any remaining 2D bits
 	R_Set2DMode( false );

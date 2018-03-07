@@ -878,9 +878,9 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 	VectorMA( point, frame->right * scale, v_right, verts[3] );
 	pglEnableClientState( GL_VERTEX_ARRAY );
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	vglVertexPointer( 3, GL_FLOAT, 0, 4, verts );
-	vglTexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
-	vglDrawObjects( GL_TRIANGLE_FAN, 4, GL_TRUE );
+	Vita_VertexPointer( 3, GL_FLOAT, 0, 4, verts );
+	Vita_TexCoordPointer( 2, GL_FLOAT, 0, 4, uvs );
+	Vita_DrawGLPoly( GL_TRIANGLE_FAN, 4, GL_TRUE );
 	pglDisableClientState( GL_VERTEX_ARRAY );
 	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 #else

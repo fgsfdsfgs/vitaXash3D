@@ -1,0 +1,8 @@
+﻿float4 main(
+	float2 vTexCoord : TEXCOORD0,
+	uniform float4 uColor,
+	uniform sampler2D uTex
+	)
+{	
+	return tex2D(uTex, vTexCoord) * uColor;
+}
