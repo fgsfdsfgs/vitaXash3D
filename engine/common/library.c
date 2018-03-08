@@ -157,17 +157,19 @@ static void *IOS_LoadLibrary( const char *dllname )
 
 void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 {
-	searchpath_t	*search = NULL;
-	int		pack_ind;
-	char	path [MAX_SYSPATH];
-	void *pHandle;
+	dll_user_t *hInst = NULL;
+	void *pHandle = NULL;
 
+	// platforms where gameinfo mechanism is impossible
+	// or not implemented
 #if TARGET_OS_IPHONE
-	return IOS_LoadLibrary(dllname);
-#endif
-
-#ifdef __EMSCRIPTEN__
 	{
+		return IOS_LoadLibrary( dllname );
+	}
+#elif defined( __EMSCRIPTEN__ )
+	{
+#ifdef EMSCRIPTEN_LIB_FS
+		char path[MAX_SYSPATH];
 		string prefix;
 		Q_strcpy(prefix, getenv( "LIBRARY_PREFIX" ) );
 		Q_snprintf( path, MAX_SYSPATH, "%s%s%s",  prefix, dllname, getenv( "LIBRARY_SUFFIX" ) );
@@ -178,66 +180,103 @@ void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 			Com_PushLibraryError( dlerror() );
 		}
 		return pHandle;
+#else
+		// get handle of preloaded library outside fs
+		return EM_ASM_INT( return DLFCN.loadedLibNames[Pointer_stringify($0)], (int)dllname );
+#endif
+	}
+#elif defined( __ANDROID__ )
+	{
+		char path[MAX_SYSPATH];
+		const char *libdir[2];
+		int i;
+
+		libdir[0] = getenv("XASH3D_GAMELIBDIR");
+		libdir[1] = getenv("XASH3D_ENGLIBDIR");
+
+		for( i = 0; i < 2; i++ )
+		{
+			Q_snprintf( path, MAX_SYSPATH, "%s/lib%s"POSTFIX"."OS_LIB_EXT, libdir[i], dllname );
+			pHandle = dlopen( path, RTLD_LAZY );
+			if( pHandle )
+				return pHandle;
+
+			Com_PushLibraryError( dlerror() );
+		}
+
+		// HACKHACK: keep old behaviour for compability
+		pHandle = dlopen( dllname, RTLD_LAZY );
+		if( pHandle )
+			return pHandle;
+
+		Com_PushLibraryError( dlerror() );
 	}
 #endif
 
-	qboolean dll = host.enabledll && ( Q_stristr( dllname, ".dll" ) != 0 );
-#ifdef DLL_LOADER
-	if(dll)
+	// platforms where gameinfo mechanism is working goes here
+	// and use FS_FindLibrary
+	hInst = FS_FindLibrary( dllname, false );
+	if( !hInst )
 	{
-		pHandle = Loader_LoadLibrary( dllname );
-		if(!pHandle)
+		// HACKHACK: direct load dll
+#ifdef DLL_LOADER
+		if( host.enabledll && ( pHandle = Loader_LoadLibrary(dllname)) )
 		{
-			string errorstring;
-			Q_snprintf( errorstring, MAX_STRING, "Failed to load dll with dll loader: %s", dllname );
-			Com_PushLibraryError( errorstring );
+			return pHandle;
+		}
+#endif
+
+		// try to find by linker(LD_LIBRARY_PATH, DYLD_LIBRARY_PATH, LD_32_LIBRARY_PATH and so on...)
+		if( !pHandle )
+		{
+			pHandle = dlopen( dllname, RTLD_LAZY );
+			if( pHandle )
+				return pHandle;
+
+			Com_PushLibraryError( va( "Failed to find library %s", dllname ));
+			Com_PushLibraryError( dlerror() );
+			return NULL;
+		}
+	}
+
+	if( hInst->custom_loader )
+	{
+		Com_PushLibraryError( va( "Custom library loader is not available. Extract library %s and fix gameinfo.txt!", hInst->fullPath ));
+		Mem_Free( hInst );
+		return NULL;
+	}
+
+#ifdef DLL_LOADER
+	if( host.enabledll && ( !Q_stricmp( FS_FileExtension( hInst->shortPath ), "dll" ) ) )
+	{
+		if( hInst->encrypted )
+		{
+			Com_PushLibraryError( va( "Library %s is encrypted. Cannot load", hInst->shortPath ) );
+			Mem_Free( hInst );
+			return NULL;
+		}
+
+		if( !( hInst->hInstance = Loader_LoadLibrary( hInst->fullPath ) ) )
+		{
+			Com_PushLibraryError( va( "Failed to load DLL with DLL loader: %s", hInst->shortPath ) );
+			Mem_Free( hInst );
+			return NULL;
 		}
 	}
 	else
 #endif
 	{
-		pHandle = dlopen( dllname, RTLD_LAZY );
-		if( !pHandle )
-			Com_PushLibraryError(dlerror());
-	}
-	if(!pHandle)
-	{
-		search = FS_FindFile( dllname, &pack_ind, true );
-
-		if( !search )
+		if( !( hInst->hInstance = dlopen( hInst->fullPath, RTLD_LAZY ) ) )
 		{
-			return NULL;
-		}
-#ifdef __vita__
-		sprintf( path, CWD "/%s%s", search->filename, dllname );
-#else
-		sprintf( path, "%s%s", search->filename, dllname );
-#endif
-
-
-#ifdef DLL_LOADER
-		if(dll)
-		{
-			pHandle = Loader_LoadLibrary( path );
-			if(!pHandle)
-			{
-				string errorstring;
-				Q_snprintf( errorstring, MAX_STRING, "Failed to load dll with dll loader: %s", dllname );
-				Com_PushLibraryError( errorstring );
-			}
-		}
-		else
-#endif
-		{
-			pHandle = dlopen( path, RTLD_LAZY );
-			if( !pHandle )
-				Com_PushLibraryError( dlerror() );
-		}
-		if(!pHandle)
-		{
+			Com_PushLibraryError( dlerror() );
+			Mem_Free( hInst );
 			return NULL;
 		}
 	}
+
+	pHandle = hInst->hInstance;
+
+	Mem_Free( hInst );
 
 	return pHandle;
 }

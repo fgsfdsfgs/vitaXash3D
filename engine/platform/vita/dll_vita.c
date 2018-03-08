@@ -81,12 +81,15 @@ void *dlopen( const char *name, int flag )
 	dll_t *old = dlfind( name );
 	if( old ) { old->refcnt++; return old; }
 
+	char fullpath[MAX_SYSPATH];
+	Q_snprintf( fullpath, sizeof(fullpath), CWD "/%s", name );
+
 	modarg.imports = sys_exports;
 	modarg.exports = NULL;
 
 	int status = 0;
 	modarg_t *arg = &modarg;
-	SceUID h = sceKernelLoadStartModule( (char*)name, sizeof( arg ), &arg, 0, NULL, &status );
+	SceUID h = sceKernelLoadStartModule( fullpath, sizeof( arg ), &arg, 0, NULL, &status );
 
 	if( !h ) { dll_err = "dlopen(): something went wrong"; return NULL; }
 	if( h < 0 )
