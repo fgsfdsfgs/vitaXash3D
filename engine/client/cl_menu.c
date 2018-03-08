@@ -1052,7 +1052,11 @@ qboolean UI_LoadProgs( void )
 			return false;
 	}
 #else
+#ifdef __vita__
+	if(!( menu.hInstance = Com_LoadLibrary( MENUDLL, false )))
+#else
 	if(!( menu.hInstance = Com_LoadLibrary( va( "%s/" MENUDLL, GI->dll_path ), false )))
+#endif
 	{
 		FS_AllowDirectPaths( true );
 

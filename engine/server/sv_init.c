@@ -484,7 +484,7 @@ Change the server to a new map, taking all connected
 clients along with it.
 ================
 */
-extern convar_t *teamplay_sv;
+extern convar_t *teamplay;
 qboolean SV_SpawnServer( const char *mapname, const char *startspot )
 {
 	int	i, current_skill;
@@ -505,7 +505,7 @@ qboolean SV_SpawnServer( const char *mapname, const char *startspot )
 
 	sv_maxclients->modified = false;
 	deathmatch->modified = false;
-	teamplay_sv->modified = false;
+	teamplay->modified = false;
 	coop->modified = false;
 
 	if( !svs.initialized )

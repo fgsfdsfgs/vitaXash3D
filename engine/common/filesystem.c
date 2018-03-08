@@ -1872,13 +1872,15 @@ void FS_LoadGameInfo( const char *rootfolder )
 	{
 #if defined(_WIN32)
 		Q_strncpy( SI.gamedll, GI->game_dll, sizeof( SI.gamedll ) );
-#elif TARGET_OS_IPHONE || defined __EMSCRIPTEN__ || defined __vita__
+#elif TARGET_OS_IPHONE || defined __EMSCRIPTEN__
 		Q_strncpy( SI.gamedll, "server", sizeof( SI.gamedll ) );
 #elif defined(__APPLE__)
 		Q_strncpy( SI.gamedll, GI->game_dll_osx, sizeof( SI.gamedll ) );
 #elif defined(__ANDROID__)
 		Q_strncpy( SI.gamedll, getenv("XASH3D_GAMELIBDIR"), sizeof( SI.gamedll ) );
 		Q_strncat( SI.gamedll, "/" SERVERDLL, sizeof( SI.gamedll ) );
+#elif defined(__vita__)
+		Q_strncat( SI.gamedll, "dlls/" SERVERDLL, sizeof( SI.gamedll ) );
 #else
 		Q_strncpy( SI.gamedll, GI->game_dll_linux, sizeof( SI.gamedll ) );
 #endif

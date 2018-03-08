@@ -1405,7 +1405,13 @@ double Sys_DoubleTime( void )
 	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
 }
 #elif defined __vita__
-extern "C" double Sys_DoubleTime( void );
+#include <vitasdk.h>
+double Sys_DoubleTime( void )
+{
+	static SceRtcTick ticks;
+	sceRtcGetCurrentTick( &ticks );
+	return ticks.tick * 0.000001;
+}
 #else
 typedef unsigned long long longtime_t;
 #include <time.h>

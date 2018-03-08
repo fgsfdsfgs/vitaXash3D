@@ -98,18 +98,93 @@ typedef struct dllexport_s
 	void *func;
 } dllexport_t;
 
-dllexport_t vita_mainui_exports[] = {
+dllexport_t vita_mainui_exports[] =
+{
 	{ "GetMenuAPI", (void*)GetMenuAPI },
 	{ "GiveTextAPI", (void*)GiveTextAPI },
 	{ "AddTouchButtonToList", (void*)AddTouchButtonToList },
 	{ NULL, NULL },
 };
 
-extern "C" int dll_register( const char *name, dllexport_t *exports );
-
-extern "C" int vita_installdll_mainui( void )
+extern "C"
 {
-	return dll_register( "menu", vita_mainui_exports );
+
+#include <vitasdk.h>
+
+// hacks to make libc work
+
+void* __dso_handle = (void*) &__dso_handle;
+
+extern void _init_vita_reent( void );
+extern void _free_vita_reent( void );
+
+extern void __libc_init_array( void );
+extern void __libc_fini_array( void );
+
+void _init_vita_newlib( void )
+{
+	_init_vita_reent( );
+}
+
+void _free_vita_newlib( void )
+{
+	_free_vita_reent( );
+}
+
+void _fini( void ) { }
+void _init( void ) { }
+
+// just in case
+unsigned int _newlib_heap_size_user = 4096;
+
+typedef struct sysfuncs_s
+{
+	// mem
+	void* (*pfnSysMalloc)(size_t);
+	void* (*pfnSysCalloc)(size_t, size_t);
+	void* (*pfnSysRealloc)(void*, size_t);
+	void  (*pfnSysFree)(void*);
+	// i/o
+	FILE* (*pfnSysFopen)(const char*, const char*);
+	int (*pfnSysFclose)(FILE*);
+	int (*pfnSysFseek)(FILE*, long int, int);
+	long int (*pfnSysFtell)(FILE*);
+	int (*pfnSysFprintf)(FILE*, const char*, ...);
+	size_t (*pfnSysFread)(void*, size_t, size_t, FILE*);
+	size_t (*pfnSysFwrite)(const void*, size_t, size_t, FILE*);
+} sysfuncs_t;
+
+typedef struct modarg_s
+{
+	sysfuncs_t imports;
+	dllexport_t *exports;
+} modarg_t;
+
+int module_stop( SceSize argc, const void *args )
+{
+	__libc_fini_array( );
+	_free_vita_newlib( );
+	return SCE_KERNEL_STOP_SUCCESS;
+}
+
+int module_exit( )
+{
+	__libc_fini_array( );
+	_free_vita_newlib( );
+	return SCE_KERNEL_STOP_SUCCESS;
+}
+
+void _start() __attribute__ ((weak, alias ("module_start")));
+int module_start( SceSize argc, void *args )
+{
+	_init_vita_newlib( );
+	__libc_init_array( );
+
+	modarg_t *arg = *(modarg_t **)args;
+	arg->exports = vita_mainui_exports;
+	return SCE_KERNEL_START_SUCCESS;
+}
+
 }
 
 #endif

@@ -208,7 +208,11 @@ void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 		{
 			return NULL;
 		}
+#ifdef __vita__
+		sprintf( path, CWD "/%s%s", search->filename, dllname );
+#else
 		sprintf( path, "%s%s", search->filename, dllname );
+#endif
 
 
 #ifdef DLL_LOADER

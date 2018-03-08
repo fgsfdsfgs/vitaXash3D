@@ -2163,6 +2163,8 @@ void CL_Init( void )
 			loaded = CL_LoadProgs( clientlib );
 		}
 	}
+#elif defined (__vita__)
+	loaded = CL_LoadProgs( "cl_dlls/" CLIENTDLL );
 #else
 	{
 		char clientlib[256];

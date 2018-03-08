@@ -83,7 +83,7 @@ int main( int argc, char **argv )
 	vita_argc = argc;
 	vita_argv = argv;
 
-	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x100000, 0, 0, NULL );
+	SceUID main_thread = sceKernelCreateThread( "Xash", xash_main, 0x40, 0x200000, 0, 0, NULL );
 	if( main_thread >= 0 )
 	{
 		sceKernelStartThread( main_thread, 0, NULL );
@@ -97,14 +97,6 @@ int xash_main( unsigned int argsize, void *arg )
 int main( int argc, char** argv )
 #endif
 {
-#ifdef __vita__
-	extern int vita_installdll_mainui( void );
-	extern int vita_installdll_client( void );
-	extern int vita_installdll_server( void );
-	vita_installdll_mainui( );
-	vita_installdll_server( );
-	vita_installdll_client( );
-#endif
 	char gamedir_buf[32] = "";
 	const char *gamedir = getenv("XASH3D_GAMEDIR");
 

@@ -48,11 +48,13 @@ GNU General Public License for more details.
 	#if defined(__APPLE__)
 		#include <sys/syslimits.h>
 		#define OS_LIB_EXT "dylib"
-        #define OPEN_COMMAND "open"
+		#define OPEN_COMMAND "open"
 		#include "TargetConditionals.h"
+	#elif defined(__vita__)
+		#define OS_LIB_EXT "suprx"
 	#else
 		#define OS_LIB_EXT "so"
-        #define OPEN_COMMAND "xdg-open"
+		#define OPEN_COMMAND "xdg-open"
 	#endif
 
 	#if defined(__ANDROID__)
@@ -68,12 +70,12 @@ GNU General Public License for more details.
 		#define SERVERDLL "libserver" POSTFIX "." OS_LIB_EXT
 		#define GAMEPATH "/sdcard/xash"
 	#elif defined(__vita__)
-		#define MENUDLL   "menu"
-		#define CLIENTDLL "client"
-		#define SERVERDLL "server"
-  #else
-    #define MENUDLL "libxashmenu" ARCH_SUFFIX "." OS_LIB_EXT
-    #define CLIENTDLL "client" ARCH_SUFFIX "." OS_LIB_EXT
+		#define MENUDLL   "menu." OS_LIB_EXT
+		#define SERVERDLL "server." OS_LIB_EXT
+		#define CLIENTDLL "client." OS_LIB_EXT
+	#else
+		#define MENUDLL "libxashmenu" ARCH_SUFFIX "." OS_LIB_EXT
+		#define CLIENTDLL "client" ARCH_SUFFIX "." OS_LIB_EXT
 	#endif
 
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT

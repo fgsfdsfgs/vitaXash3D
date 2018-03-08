@@ -1,5 +1,5 @@
 /*
-std_vita.c - libc function wrappers for vita
+dll_vita.c - libdl function wrappers for vita
 Copyright (C) 2018 fgsfds
 
 This program is free software: you can redistribute it and/or modify
@@ -15,17 +15,46 @@ GNU General Public License for more details.
 
 #include "common.h"
 #include "dll_vita.h"
+#include <vitasdk.h>
+
+#define MAX_DLNAMELEN 256
 
 typedef struct dll_s
 {
-	const char *name;
+	SceUID handle;
+	char name[MAX_DLNAMELEN];
 	int refcnt;
 	dllexport_t *exp;
 	struct dll_s *next;
 } dll_t;
 
+typedef struct modarg_s
+{
+	sysfuncs_t imports;
+	dllexport_t *exports;
+} modarg_t;
+
+static sysfuncs_t sys_exports = {
+	// mem
+	malloc,
+	calloc,
+	realloc,
+	free,
+	// io
+	fopen,
+	fclose,
+	fseek,
+	ftell,
+	fprintf,
+	fread,
+	fwrite,
+};
+
+static modarg_t modarg;
+
 static dll_t *dll_list;
 static char *dll_err = NULL;
+static char dll_err_buf[1024];
 
 static void *dlfind( const char *name )
 {
@@ -47,10 +76,49 @@ static const char *dlname( void *handle )
 
 void *dlopen( const char *name, int flag )
 {
-	dll_t *d = dlfind( name );
-	if( d ) d->refcnt++;
-	else dll_err = "dlopen(): unknown dll name"; 
-	return d;
+	if( !name ) return NULL;
+
+	dll_t *old = dlfind( name );
+	if( old ) { old->refcnt++; return old; }
+
+	modarg.imports = sys_exports;
+	modarg.exports = NULL;
+
+	int status = 0;
+	modarg_t *arg = &modarg;
+	SceUID h = sceKernelLoadStartModule( (char*)name, sizeof( arg ), &arg, 0, NULL, &status );
+
+	if( !h ) { dll_err = "dlopen(): something went wrong"; return NULL; }
+	if( h < 0 )
+	{
+		snprintf( dll_err_buf, sizeof( dll_err_buf ), "dlopen(%s): error 0x%X\n", name, h );
+		dll_err = dll_err_buf;
+		return NULL;
+	}
+
+	if( status == SCE_KERNEL_START_FAILED || status == SCE_KERNEL_START_NO_RESIDENT )
+	{
+		dll_err = "dlopen(): module_start() failed";
+		return NULL;
+	}
+
+	if( !modarg.exports )
+	{
+		dll_err = "dlopen(): NULL exports";
+		return NULL;
+	}
+
+	dll_t *new = calloc( 1, sizeof( dll_t ) );
+	if( !new ) { dll_err = "dlopen(): out of memory";  return NULL; }
+	snprintf( new->name, MAX_DLNAMELEN, name );
+	new->handle = h;
+	new->exp = modarg.exports;
+	new->refcnt = 1;
+
+	new->next = dll_list;
+	dll_list = new;
+
+	return new;
 }
 
 void *dlsym( void *handle, const char *symbol )
@@ -79,9 +147,39 @@ int dlclose( void *handle )
 {
 	if( !handle ) { dll_err = "dlclose(): NULL arg"; return -1; }
 	if( !dlname( handle ) ) { dll_err = "dlclose(): unknown handle"; return -2; }
+
 	dll_t *d = handle;
-	if( !d->refcnt ) { dll_err = "dlclose(): call dlopen() first"; return -3; }
 	d->refcnt--;
+	if( d->refcnt <= 0 )
+	{
+		int status = 0;
+		int ret = sceKernelStopUnloadModule( d->handle, 0, NULL, 0, NULL, &status );
+		if( ret != SCE_OK )
+		{
+			snprintf( dll_err_buf, sizeof( dll_err_buf ), "dlclose(): error %d", ret );
+			dll_err = dll_err_buf;
+		}
+		else if( status == SCE_KERNEL_STOP_CANCEL )
+		{
+			dll_err = "dlclose(): module doesn't want to stop";
+			return -3;
+		}
+
+		if( d == dll_list )
+			dll_list = NULL;
+		else
+			for( dll_t *pd = dll_list; pd; pd = pd->next )
+			{
+				if( pd->next == d )
+				{
+					pd->next = d->next;
+					break;
+				}
+			}
+
+		free( d );
+	}
+
 	return 0;
 }
 
@@ -111,18 +209,4 @@ for_end:
 		return 1;
 	}
 	return 0;
-}
-
-// export registering api for all dlls //
-
-int dll_register( const char *name, dllexport_t *exports )
-{
-	if( !name || !exports ) return -1;
-	if( dlfind( name ) ) return -2; // already registered
-	dll_t *new = calloc( 1, sizeof( dll_t ) );
-	if( !new ) return -3;
-	new->name = name;
-	new->exp = exports;
-	new->next = dll_list;
-	dll_list = new;
 }

@@ -1,7 +1,7 @@
 APPNAME := vitaXash3D
 TITLE := XASH00001
 
-LIBS = -L. -lxashmenu -lclient -lserver -lvitaGL \
+LIBS = -lvitaGL \
        -lSceLibKernel_stub -lSceAppMgr_stub -lSceSysmodule_stub \
        -lSceCtrl_stub -lSceTouch_stub -lm -lSceNet_stub -lSceNetCtl_stub \
        -lSceAppUtil_stub -lc -lScePower_stub -lSceCommonDialog_stub \
@@ -20,7 +20,7 @@ C_SERVER = $(wildcard engine/server/*.c)
 C_SYSTEM = $(wildcard engine/platform/vita/*.c)
 
 CFILES   := $(C_SYSTEM) $(C_COMMON) $(C_SERVER) $(C_CLIENT)
-# CPPFILES := $(CXX_MENU)
+
 OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)
 
 PREFIX    = arm-vita-eabi
@@ -34,23 +34,13 @@ CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned
 CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=c++11 -fpermissive
 ASFLAGS   = $(CFLAGS)
 
-all: launcher.bin libxashmenu.a libclient.a libserver.a $(APPNAME).vpk
+all: launcher.bin $(APPNAME).vpk
 
 launcher.bin:
 	$(MAKE) -C modselector
 
-libxashmenu.a:
+menu:
 	$(MAKE) -C mainui
-
-libclient.a:
-	$(MAKE) -C hlsdk/cl_dll clean
-	$(MAKE) -C hlsdk/dlls clean
-	$(MAKE) -C hlsdk/cl_dll
-
-libserver.a:
-	$(MAKE) -C hlsdk/cl_dll clean
-	$(MAKE) -C hlsdk/dlls clean
-	$(MAKE) -C hlsdk/dlls
 
 shaders:
 	$(MAKE) -C shaders
@@ -91,10 +81,7 @@ xash.elf: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 clean:
-	$(MAKE) -C mainui clean
 	$(MAKE) -C modselector clean
-	$(MAKE) -C hlsdk/cl_dll clean
-	$(MAKE) -C hlsdk/dlls clean
-	@rm -rf libxashmenu.a libclient.a libserver.a launcher.bin
+	@rm -rf launcher.bin
 	@rm -rf build/eboot.bin build/xash.bin build/sce_sys/param.sfo param.sfo *.vpk.*
 	@rm -rf xash.velf xash.elf $(OBJS)
