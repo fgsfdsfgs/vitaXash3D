@@ -352,7 +352,7 @@ qboolean R_Init_OpenGL( void )
 	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );
 	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
-	vglInit( 0x2000000 );
+	vglInit( 0x1800000 );
 	vglUseVram( GL_TRUE );
 	vglWaitVblankStart( GL_TRUE );
 
