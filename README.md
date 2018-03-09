@@ -44,9 +44,11 @@ If you don't have the full version of HL and are using the Uplink archive linked
 
 #### Available game libraries
 * [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2 and in the Uplink archive)
+* [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (reverse-engineered by FWGS)
+* [Opposing Force](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/opfor) (reverse-engineered by FWGS)
 
 ## Credits
-- Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS;
+- Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS and game DLL source code;
 - Vita SDK Team for the Vita SDK;
 - Rinnegatamante for vitaGL, vitaQuake/vitaQuakeII and general advice;
 - ArkSource for the Live Area stuff;
