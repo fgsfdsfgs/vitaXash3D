@@ -26,7 +26,7 @@ Run `make` in this directory. This should produce a VPK.
 The console log is saved to `ux0:/data/xash3d/engine.log` when debug mode is enabled.
 
 If you don't have any GoldSrc games, you can use the data files from Half-Life Uplink, HL's free demo version.
-To do so, just extract [this archive]() to `ux0:/` *instead of doing step 1 and 2* from the guide above.
+To do so, just extract [this archive](https://drive.google.com/file/d/18DCj4KFS7GMaBZyQ3BPgdM8s1mA7AWED/view) to `ux0:/` **instead of doing step 1** from the guide above.
 
 Keep in mind that the game can hang for a long time when saving or autosaving (see issue [#7](https://github.com/fgsfdsfgs/vitaXash3D/issues/7)),
 so don't kill it if it suddenly hangs when you enter a map or cross a checkpoint. You can disable autosaves in the "Game options" menu or with `sv_autosave 0`.
@@ -43,9 +43,9 @@ If you're trying to run a mod that has no game libraries, Xash will try to fall 
 If you don't have the full version of HL and are using the Uplink archive linked above, multiplayer and other mods won't work. If you have the full version of HL, you can also install Uplink as a mod by copying **only** the `uplink` folder from the same archive.
 
 #### Available game libraries
-* [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2 and in the Uplink archive)
-* [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (reverse-engineered by FWGS)
-* [Opposing Force](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/opfor) (reverse-engineered by FWGS)
+* [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2)
+* [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (included in vitaXash3D releases after v2)
+* [Opposing Force](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/opfor) (included in vitaXash3D releases after v2)
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS and game DLL source code;
