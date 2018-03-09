@@ -60,7 +60,7 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 #endif
 
 #ifdef __vita__
-unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
+unsigned int _newlib_heap_size_user = 100 * 1024 * 1024;
 static int vita_argc = 0;
 static char **vita_argv = NULL;
 
