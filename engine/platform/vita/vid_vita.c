@@ -410,7 +410,7 @@ void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei wi
 		}
 	}
 
-	internalformat = format;
+	internalformat = format = GL_RGBA;
 	glTexImage2D( target, level, internalformat, width, height, border, format, type, data );
 
 	if( data != pixels ) free( data );

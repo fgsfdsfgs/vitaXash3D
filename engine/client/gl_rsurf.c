@@ -817,52 +817,33 @@ Render lightmaps
 */
 void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 {
+#ifdef __vita__
+	pglEnableClientState( GL_VERTEX_ARRAY );
+	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
+	for( ; p != NULL; p = p->chain )
+	{
+		float *vertp = gl_vgl_verts;
+		float *uvp = gl_vgl_texcoords;
+		float *v = p->verts[0];
+		for( int i = 0; i < p->numverts; i++, v += VERTEXSIZE )
+		{
+			*(uvp++) = v[5] - soffset; *(uvp++) = v[6] - toffset;
+			*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
+		}
+		Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
+		Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
+		Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
+	}
+
+	pglDisableClientState( GL_VERTEX_ARRAY );
+	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+#else
 	qboolean	dynamic = true;
 
 	if( soffset == 0.0f && toffset == 0.0f )
 		dynamic = false;
 
-#ifdef __vita__
-	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-
-	float	*v;
-	int	i;
-
-	if( dynamic )
-		for( ; p != NULL; p = p->chain )
-		{
-			float *vertp = gl_vgl_verts;
-			float *uvp = gl_vgl_texcoords;
-			v = p->verts[0];
-			for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
-			{
-				*(uvp++) = v[5] - soffset; *(uvp++) = v[6] - toffset;
-				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
-			}
-			Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-			Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-			Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
-		}
-	else
-		for( ; p != NULL; p = p->chain )
-		{
-			float *vertp = gl_vgl_verts;
-			float *uvp = gl_vgl_texcoords;
-			v = p->verts[0];
-			for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
-			{
-				*(uvp++) = v[5]; *(uvp++) = v[6];
-				*(vertp++) = v[0]; *(vertp++) = v[1]; *(vertp++) = v[2];
-			}
-			Vita_VertexPointer( 3, GL_FLOAT, 0, p->numverts, gl_vgl_verts );
-			Vita_TexCoordPointer( 2, GL_FLOAT, 0, p->numverts, gl_vgl_texcoords );
-			Vita_DrawGLPoly( GL_TRIANGLE_FAN, p->numverts, GL_TRUE );
-		}
-
-	pglDisableClientState( GL_VERTEX_ARRAY );
-	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-#else
 	for( ; p != NULL; p = p->chain )
 	{
 		float	*v;
@@ -1136,7 +1117,7 @@ void R_RenderDetails( void )
 			fa = INFO_SURF( p, RI.currentmodel );
 			glt = R_GetTexture( fa->texinfo->texture->gl_texturenum ); // get texture scale
 			DrawGLPoly( fa->polys, glt->xscale, glt->yscale );
-                    }
+		}
 
 		detail_surfaces[i] = NULL;
 		es->detailchain = NULL;		
