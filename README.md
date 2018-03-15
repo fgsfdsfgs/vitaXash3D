@@ -6,11 +6,7 @@ This port is still a work in progress. Expect graphics and sound glitches, crash
 
 ## Requirements
 - VitaSDK (in PATH and with VITASDK set);
-- [vitaGL](https://github.com/Rinnegatamante/vitaGL).
-
-If you're experiencing bugs with the latest version of vitaGL, try [this version](https://github.com/Rinnegatamante/vitaGL/tree/cdfb4290ead01d39611b46846a23ef66a258b3ce).
-
-If HL crashes when loading the first map in Unforeseen Consequences or you're experiencing similar crashes on map loads, try increasing `TEXTURES_NUM` in `vitaGL.c` to 1536.
+- [My fork](https://github.com/fgsfdsfgs/vitaGL/tree/xash_additions) of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
 
 ## Building
 Run `make` in this directory. This should produce a VPK.
