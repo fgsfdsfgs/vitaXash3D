@@ -178,7 +178,7 @@ void GL_InitExtensions( void )
 	GL_SetExtension( GL_DEPTH_TEXTURE, false );
 
 	glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
-	glConfig.max_2d_texture_size = 2048;
+	glConfig.max_2d_texture_size = 4096;
 
 	Cvar_Get( "gl_max_texture_size", "0", CVAR_INIT, "opengl texture max dims" );
 	Cvar_Set( "gl_max_texture_size", va( "%i", glConfig.max_2d_texture_size ) );
@@ -352,8 +352,7 @@ qboolean R_Init_OpenGL( void )
 	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );
 	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
-	vglInit( 0x1800000 );
-	vglUseVram( GL_TRUE );
+	vglInit( 0x100000, GL_TRUE, 72 * 1024 * 1024 );
 	vglWaitVblankStart( GL_TRUE );
 
 	Vita_ReloadShaders( );
@@ -394,26 +393,17 @@ void R_Free_OpenGL( void )
 // backported from FWGS' nanogl
 void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels )
 {
-	uint8_t *data = (uint8_t*)pixels;
+	uint8_t *in = (uint8_t*)pixels;
 
 	if( internalformat == GL_RGB && format == GL_RGBA ) // strip alpha from texture
 	{
-		uint8_t *in = data, *out;
 		int i = 0, size = width * height * 4;
-
-		data = out = malloc( size );
-	
-		for( i = 0; i < size; i += 4, in += 4, out += 4 )
-		{
-			memcpy( out, in, 3 );
-			out[3] = 255;
-		}
+		for( i = 0; i < size; i += 4, in += 4 )
+			in[3] = 255;
 	}
 
 	internalformat = format = GL_RGBA;
-	glTexImage2D( target, level, internalformat, width, height, border, format, type, data );
-
-	if( data != pixels ) free( data );
+	glTexImage2D( target, level, internalformat, width, height, border, format, type, pixels );
 }
 
 /* SHADER STUFF */

@@ -3112,11 +3112,11 @@ void GAME_EXPORT TriColor4f( float r, float g, float b, float a )
 	clgame.ds.triColor[1] = (byte)bound( 0, (g * 255.0f), 255 );
 	clgame.ds.triColor[2] = (byte)bound( 0, (b * 255.0f), 255 );
 	clgame.ds.triColor[3] = (byte)bound( 0, (a * 255.0f), 255 );
-#ifdef __vita__
-	*(tri_colorp++) = r; *(tri_colorp++) = g; *(tri_colorp++) = b; *(tri_colorp++) = a;
-	if( tri_mode ) return;
-#endif
 	pglColor4ub( clgame.ds.triColor[0], clgame.ds.triColor[1], clgame.ds.triColor[2], clgame.ds.triColor[3] );
+#ifdef __vita__
+	if( !tri_mode ) return;
+	*(tri_colorp++) = r; *(tri_colorp++) = g; *(tri_colorp++) = b; *(tri_colorp++) = a;
+#endif
 }
 
 /*
@@ -3131,11 +3131,11 @@ void GAME_EXPORT TriColor4ub( byte r, byte g, byte b, byte a )
 	clgame.ds.triColor[1] = g;
 	clgame.ds.triColor[2] = b;
 	clgame.ds.triColor[3] = a;
-#ifdef __vita__
-	*(tri_colorp++) = r / 255.f; *(tri_colorp++) = g / 255.f; *(tri_colorp++) = b / 255.f; *(tri_colorp++) = a / 255.f;
-	if( tri_mode ) return;
-#endif
 	pglColor4ub( r, g, b, a );
+#ifdef __vita__
+	if( !tri_mode ) return;
+	*(tri_colorp++) = r / 255.f; *(tri_colorp++) = g / 255.f; *(tri_colorp++) = b / 255.f; *(tri_colorp++) = a / 255.f;
+#endif
 }
 
 /*
@@ -3193,6 +3193,9 @@ TriBrightness
 */
 void GAME_EXPORT TriBrightness( float brightness )
 {
+#ifdef __vita__
+	return;
+#endif
 	rgba_t	rgba;
 
 	brightness = max( 0.0f, brightness );
@@ -3201,11 +3204,11 @@ void GAME_EXPORT TriBrightness( float brightness )
 	rgba[2] = clgame.ds.triColor[2] * brightness;
 	rgba[3] = clgame.ds.triColor[3] * brightness;
 
-#ifdef __vita__
-	*(tri_colorp++) = rgba[0] / 255.f; *(tri_colorp++) = rgba[1] / 255.f; *(tri_colorp++) = rgba[2] / 255.f; *(tri_colorp++) = rgba[3] / 255.f;
-	if( tri_mode ) return;
-#endif
 	pglColor4ubv( rgba );
+#ifdef __vita__
+	if( !tri_mode ) return;
+	*(tri_colorp++) = rgba[0] / 255.f; *(tri_colorp++) = rgba[1] / 255.f; *(tri_colorp++) = rgba[2] / 255.f; *(tri_colorp++) = rgba[3] / 255.f;
+#endif
 }
 
 /*
