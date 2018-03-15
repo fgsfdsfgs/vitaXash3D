@@ -1,6 +1,6 @@
 ﻿float4 main(
 	float2 vTexCoord : TEXCOORD0,
-	uniform sampler2D uTex
+	uniform sampler2D uTex : TEXUNIT0
 	)
 {	
 	float4 c = tex2D(uTex, vTexCoord);
