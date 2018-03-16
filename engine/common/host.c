@@ -1054,6 +1054,18 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 	// first text message into console or log 
 	MsgDev( D_NOTE, "Console initialized\n" );
 
+#ifdef __vita__
+	SceKernelFreeMemorySizeInfo freemem;
+	freemem.size = sizeof(SceKernelFreeMemorySizeInfo);
+	sceKernelGetFreeMemorySize(&freemem);
+	MsgDev( D_NOTE, "FREE MEMORY REPORT:\n" );
+	MsgDev( D_NOTE, "--------------------\n" );
+	MsgDev( D_NOTE, "USER_RW:  %dk\n", freemem.size_user / 1024 );
+	MsgDev( D_NOTE, "CDRAM_RW: %dk\n", freemem.size_cdram / 1024 );
+	MsgDev( D_NOTE, "PHYCONT:  %dk\n", freemem.size_phycont / 1024 );
+	MsgDev( D_NOTE, "--------------------\n" );
+#endif
+
 #if 1
 	BaseCmd_Init();
 #endif

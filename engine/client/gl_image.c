@@ -1374,7 +1374,7 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 
 	tex->format = outFormat;
 
-	MsgDev( D_NOTE, "GL_UploadTexture: uploading %s [%d x %d] orig [%d x %d] texheap before %u\n", tex->name, tex->width, tex->height, tex->srcWidth, tex->srcHeight, vglTexMemUsed() );
+	MsgDev( D_NOTE, "GL_UploadTexture: uploading %s [%d x %d] orig [%d x %d] free gpumem before %u\n", tex->name, tex->width, tex->height, tex->srcWidth, tex->srcHeight, vglMemFree( 0 ) );
 
 	// determine target
 	tex->target = glTarget = GL_TEXTURE_2D;

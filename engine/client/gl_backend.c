@@ -81,8 +81,13 @@ void GL_BackendEndFrame( void )
 	switch( r_speeds->integer )
 	{
 	case 1:
-		Q_snprintf( r_speeds_msg, sizeof( r_speeds_msg ), "%3i wpoly, %3i bpoly\n%3i epoly, %3i spoly\n%uk texmem",
-		r_stats.c_world_polys, r_stats.c_brush_polys, r_stats.c_studio_polys, r_stats.c_sprite_polys, vglTexMemUsed() / 1024 );
+#ifdef __vita__
+		Q_snprintf( r_speeds_msg, sizeof( r_speeds_msg ), "%3i wpoly, %3i bpoly\n%3i epoly, %3i spoly\ngpumem: %uk vram %uk ram",
+		r_stats.c_world_polys, r_stats.c_brush_polys, r_stats.c_studio_polys, r_stats.c_sprite_polys, vglMemFree( 1 ) / 1024, vglMemFree( 2 ) / 1024 );
+#else
+		Q_snprintf( r_speeds_msg, sizeof( r_speeds_msg ), "%3i wpoly, %3i bpoly\n%3i epoly, %3i spoly",
+		r_stats.c_world_polys, r_stats.c_brush_polys, r_stats.c_studio_polys, r_stats.c_sprite_polys);
+#endif
 		break;		
 	case 2:
 		Q_snprintf( r_speeds_msg, sizeof( r_speeds_msg ), "visible leafs:\n%3i leafs\ncurrent leaf %3i",

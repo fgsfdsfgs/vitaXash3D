@@ -344,7 +344,6 @@ qboolean R_Init_OpenGL( void )
 	VID_StartupGamma();
 	MsgDev( D_NOTE, "R_Init_OpenGL()\n");
 
-
 	gl_vgl_indices = malloc( sizeof( uint16_t ) * MAX_VGL_ARRAYSIZE );
 	for( uint16_t i = 0; i < MAX_VGL_ARRAYSIZE; ++i ) gl_vgl_indices[i] = i;
 
@@ -352,7 +351,8 @@ qboolean R_Init_OpenGL( void )
 	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );
 	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
-	vglInit( 0x100000, GL_TRUE, 72 * 1024 * 1024 );
+	vglInit( 0x800000 );
+	vglUseVram( GL_TRUE );
 	vglWaitVblankStart( GL_TRUE );
 
 	Vita_ReloadShaders( );
