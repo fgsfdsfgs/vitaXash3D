@@ -48,7 +48,7 @@ shaders:
 $(APPNAME).vpk: xash.velf launcher.bin
 	vita-make-fself -s $< build/xash.bin
 	cp -f launcher.bin build/eboot.bin
-	vita-mksfoex -s TITLE_ID="$(TITLE)" -d ATTRIBUTE2=16 "$(APPNAME)" param.sfo
+	vita-mksfoex -s TITLE_ID="$(TITLE)" -d ATTRIBUTE2=12 "$(APPNAME)" param.sfo
 	cp -f param.sfo build/sce_sys/param.sfo
 	
 	vita-pack-vpk -s build/sce_sys/param.sfo -b build/eboot.bin \
