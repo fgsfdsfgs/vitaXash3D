@@ -9,7 +9,7 @@ OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)
 PREFIX    = arm-vita-eabi
 CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
-CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -fno-lto -fno-short-enums \
+CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -flto -fno-short-enums \
             -DXASH_BUILD_COMMIT="\"$(shell git rev-parse --short HEAD 2> /dev/null || echo notset)\""
 CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=c++11 -fpermissive
 ASFLAGS   = $(CFLAGS)
