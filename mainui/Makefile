@@ -7,7 +7,7 @@ OBJS     := $(CFILES:.c=.o) $(CXXFILES:.cpp=.o)
 PREFIX    = arm-vita-eabi
 CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
-CFLAGS    = -g -nostartfiles -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -flto -fno-short-enums \
+CFLAGS    = -g -nostartfiles -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -fno-lto -fno-short-enums \
             $(INCLUDES) \
             -DXASH_STATIC -DXASH_SINGLE_BINARY
 
