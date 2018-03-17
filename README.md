@@ -6,7 +6,7 @@ This port is still a work in progress. Expect graphics and sound glitches, crash
 
 ## Requirements
 - VitaSDK (in PATH and with VITASDK set);
-- [My fork](https://github.com/fgsfdsfgs/vitaGL/tree/xash_additions) of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
+- Latest version of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
 
 ## Building
 Run `make` in this directory. This should produce a VPK.
