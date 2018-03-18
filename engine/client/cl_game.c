@@ -3193,9 +3193,6 @@ TriBrightness
 */
 void GAME_EXPORT TriBrightness( float brightness )
 {
-#ifdef __vita__
-	return;
-#endif
 	rgba_t	rgba;
 
 	brightness = max( 0.0f, brightness );
