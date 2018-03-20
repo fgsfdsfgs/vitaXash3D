@@ -149,7 +149,7 @@ Default build-depended cvar and constant values
 =========================================================================
 */
 
-#if defined __ANDROID__ || TARGET_OS_IPHONE
+#if defined __ANDROID__ || TARGET_OS_IPHONE || defined __vita__
 	#define DEFAULT_TOUCH_ENABLE "1"
 	#define DEFAULT_M_IGNORE "1"
 #else
