@@ -1233,10 +1233,12 @@ void R_BeginFrame( qboolean clearScene )
 {
 	glConfig.softwareGammaUpdate = false;	// in case of possible fails
 
+#ifndef __vita__
 	if(( gl_clear->integer || gl_overview->integer ) && clearScene && cls.state != ca_cinematic )
 	{
 		pglClear( GL_COLOR_BUFFER_BIT );
 	}
+#endif
 
 	// update gamma
 	if( vid_gamma->modified )
@@ -1272,8 +1274,15 @@ void R_BeginFrame( qboolean clearScene )
 	GL_UpdateSwapInterval();
 
 	CL_ExtraUpdate ();
+
 #ifdef __vita__
 	Vita_BeginFrame( );
+
+	// can only draw after vglBeginRendering on Vita
+	if(( gl_clear->integer || gl_overview->integer ) && clearScene && cls.state != ca_cinematic )
+	{
+		pglClear( GL_COLOR_BUFFER_BIT );
+	}
 #endif
 }
 
