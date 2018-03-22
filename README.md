@@ -29,7 +29,7 @@ so don't kill it if it suddenly hangs when you enter a map or cross a checkpoint
 
 Multiplayer seems to work, but it hasn't been tested much. You can connect to any Xash3D server as long as it is compatible with this port, meaning it has to be running the same mod as you on Xash3D-FWGS v0.19 or Xash3D build 3366.
 
-The mod launcher detects all directories you have inside `ux0:/data/xash3d/`, including `valve`, except directories that have names starting with a dot.
+The mod launcher detects all directories you have inside `ux0:/data/xash3d/`, including `valve`, except `launcher` and directories that have names starting with a dot.
 
 Installing mods works the same as with PC Half-Life: you just have to copy the mod directory (e. g. `darkstar`) into `ux0:/data/xash3d/`. Keep in mind
 that you'll also need Vita ports of the mod's game libraries, if it has any. For available ports, see list below.
@@ -48,4 +48,5 @@ If you don't have the full version of HL and are using the Uplink archive linked
 - Vita SDK Team for the Vita SDK;
 - Rinnegatamante for vitaGL, vitaQuake/vitaQuakeII and general advice;
 - ArkSource for the Live Area stuff;
+- KINGGOLDrus for some launcher graphics;
 - everyone on the #henkaku and #vitasdk IRC channels for help and/or testing.
