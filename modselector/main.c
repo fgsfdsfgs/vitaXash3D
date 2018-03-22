@@ -36,6 +36,7 @@
 static struct mod_s {
 	char dir[STRSIZE];
 	char title[STRSIZE];
+	const char *dll;
 } mods[MAXMODS];
 
 static struct mod_s *mod_order[MAXMODS];
@@ -49,6 +50,7 @@ static int mod_get_info( struct mod_s *mod, char *dir )
 	char *data = NULL;
 
 	mod->title[0] = 0;
+	mod->dll = "???";
 
 	snprintf( path, sizeof(path), CWD "/%s/gameinfo.txt", dir );
 	data = fload( path, NULL );
@@ -63,6 +65,20 @@ static int mod_get_info( struct mod_s *mod, char *dir )
 
 	if( !mod->title[0] ) return 0;
 
+	snprintf( path, sizeof(path), CWD "/%s/dlls/server.suprx", dir );
+	int sv_dll = fexists( path );
+	snprintf( path, sizeof(path), CWD "/%s/cl_dlls/client.suprx", dir );
+	int cl_dll = fexists( path );
+
+	if( sv_dll && cl_dll )
+		mod->dll = "Yes";
+	else if( sv_dll )
+		mod->dll = "Server";
+	else if( cl_dll )
+		mod->dll = "Client";
+	else
+		mod->dll = "No";
+
 	strncpy( mod->dir, dir, STRSIZE );
 	return 1;
 }
@@ -70,16 +86,20 @@ static int mod_get_info( struct mod_s *mod, char *dir )
 static int mod_scan( void )
 {
 	static char path[STRSIZE];
+
 	DIR *dp = opendir( CWD );
 	if( !dp ) return 0;
+
 	struct dirent *ep;
 	while( ep = readdir( dp ) )
 	{
-		if( !ep->d_name || ep->d_name[0] == '.' ) continue;
+		if( !ep->d_name || ep->d_name[0] == '.' || !strcmp( ep->d_name, "launcher" ) )
+			continue;
 		snprintf( path, sizeof(path), CWD "/%s", ep->d_name );
 		if( isdir( path ) )
 			nummods += mod_get_info( mods + nummods, ep->d_name );
 	}
+
 	closedir( dp );
 
 	for( int i = 0; i < nummods; ++i )
@@ -106,6 +126,7 @@ static void mod_sort( void )
 
 /*---------------------------------------------------------------------------*/
 
+static vita2d_texture *img_bg;
 static vita2d_pgf *pgf;
 static SceCtrlData pad, pad_old;
 
@@ -123,11 +144,14 @@ const unsigned int C_RED = RGBA8( 255, 0, 0, 255 );
 const unsigned int C_WHITE = RGBA8( 255, 255, 255, 255 );
 const unsigned int C_LTGREY = RGBA8( 192, 192, 192, 255 );
 const unsigned int C_GREY = RGBA8( 128, 128, 128, 255 );
-const unsigned int C_DKGREY = RGBA8( 64, 64, 64, 255 );
+const unsigned int C_DKGREY = RGBA8( 80, 80, 80, 255 );
 const unsigned int C_BLACK = RGBA8( 0, 0, 0, 255 );
 const unsigned int C_GREEN = RGBA8( 0, 255, 0, 255 );
+const unsigned int C_YELLOW = RGBA8( 255, 255, 0, 255 );
+const unsigned int C_ORANGE = RGBA8( 255, 180, 0, 255 );
+const unsigned int C_BROWN = RGBA8( 80, 64, 25, 200 );
 
-static int gfx_printf( int flags, int x, int y, unsigned int c, float s, const char *fmt, ... )
+static void gfx_printf( int flags, int x, int y, unsigned int c, float s, const char *fmt, ... )
 {
 	static char buf[4096];
 
@@ -150,6 +174,14 @@ static int gfx_printf( int flags, int x, int y, unsigned int c, float s, const c
 	vita2d_pgf_draw_text( pgf, x, y, c, s, buf );
 }
 
+static void gfx_box( int x, int y, int to_x, int to_y, int w, unsigned int c )
+{
+	vita2d_draw_rectangle( x, y, to_x - x, w, c );
+	vita2d_draw_rectangle( x, to_y - w, to_x - x, w, c );
+	vita2d_draw_rectangle( x, y, w, to_y - y, c );
+	vita2d_draw_rectangle( to_x - w, y, w, to_y - y, c );
+}
+
 static inline int b_pressed( int b )
 {
 	return (pad.buttons & b) && !(pad_old.buttons & b);
@@ -168,6 +200,17 @@ static inline void b_wait( int button )
 		if( b_held( button ) )
 			break;
 	}
+}
+
+static inline void cleanup( void )
+{
+	vita2d_fini( );
+
+	if( pgf ) vita2d_free_pgf( pgf );
+	if( img_bg ) vita2d_free_texture( img_bg );
+
+	pgf = NULL;
+	img_bg = NULL;
 }
 
 static int die( const char *fmt, ... )
@@ -195,7 +238,7 @@ static int die( const char *fmt, ... )
 
 	b_wait( SCE_CTRL_START );
 
-	vita2d_fini( );
+	cleanup( );
 	sceKernelExitProcess( 0 );
 }
 
@@ -217,7 +260,7 @@ static int update( void )
 		xash_argv[xash_argc++] = "-game";
 		xash_argv[xash_argc++] = mod_order[menu_sel]->dir;
 		xash_argv[xash_argc] = NULL;
-		vita2d_fini( );
+		cleanup( );
 		sceAppMgrLoadExec( XASH, xash_argv, NULL );
 		return 1;
 	}
@@ -233,7 +276,7 @@ static int update( void )
 		int ret = 0;
 		if( ret = sceAppMgrLoadExec( XASH, xash_argv, NULL ) )
 			die( "sceAppMgrLoadExec( \"%s\" ): %d", XASH, ret );
-		vita2d_fini( );
+		cleanup( );
 		return 1;
 	}
 
@@ -242,24 +285,28 @@ static int update( void )
 
 static void draw( void )
 {
-	gfx_printf( P_XCENTER, CX, 32, C_WHITE, 2.f, "vitaXash3D Launcher" );
-	gfx_printf( P_XCENTER, CX, 72, C_LTGREY, 1.f, "ver. %s/%s, build date %s %s",
+	if( img_bg ) vita2d_draw_texture( img_bg, 0.f, 0.f );
+
+	gfx_printf( P_ARIGHT | P_ABOTTOM, 960 - 60, 544 - 4, C_LTGREY, 0.75f, "vitaXash3D %s/%s, build date %s %s",
 		XASH_VERSION, XASH_BUILD_COMMIT, __DATE__, __TIME__ );
 
-	gfx_printf( 0, 64, 128, C_WHITE, 1.f, "Available mods:" );
+	gfx_printf( P_XCENTER, CX, 544 - 68, C_ORANGE, 1.f, "[^] [v] Select    [x] Run    [\\] Debug mode    [start] Exit" );
+
+	// game table //
+	gfx_box( 60, 160, 960 - 60, 544 - 96, 3, C_DKGREY );
+	// header
+	gfx_printf( 0, 72 + 0, 152, C_LTGREY, 1.f, "Directory" );
+	gfx_printf( 0, 72 + 128, 152, C_LTGREY, 1.f, "DLLs" );
+	gfx_printf( 0, 72 + 224, 152, C_LTGREY, 1.f, "Name" );
 	for( int i = 0; i < nummods; ++i )
 	{
-		unsigned int color = ( menu_sel == i ) ? C_GREEN : C_LTGREY;
-		gfx_printf( 0, 72, 128 + 32 + i*16, color, 1.f, mod_order[i]->title );
+		int selected = ( menu_sel == i );
+		unsigned int color = selected ? C_YELLOW : C_ORANGE;
+		if( selected ) vita2d_draw_rectangle( 60 + 4, 160 + 4 + i*20, 960 - 60 - 64 - 4, 19, C_BROWN );
+		gfx_printf( P_YCENTER, 72 + 0, 160 + 28 + i*20, color, 1.f, mod_order[i]->dir );
+		gfx_printf( P_YCENTER, 72 + 128, 160 + 28 + i*20, color, 1.f, mod_order[i]->dll );
+		gfx_printf( P_YCENTER, 72 + 224, 160 + 28 + i*20, color, 1.f, mod_order[i]->title );
 	}
-
-	gfx_printf(
-		P_ABOTTOM | P_XCENTER, CX, H-4, C_GREY, 1.f,
-		"[UP], [DOWN] choose mod\n"
-		"[CROSS] launch mod\n"
-		"[TRIANGLE] launch mod in debug mode\n"
-		"[START] exit"
-	);
 }
 
 int main( void )
@@ -267,6 +314,7 @@ int main( void )
 	vita2d_init( );
 	vita2d_set_clear_color( C_BLACK );
 	pgf = vita2d_load_default_pgf( );
+	img_bg = vita2d_load_PNG_file( CWD "/launcher/bg.png" );
 
 	if( !mod_scan( ) )
 		die( "Could not scan directory \"" CWD "\":\n%s", strerror( errno ) );
@@ -294,6 +342,7 @@ int main( void )
 		vita2d_swap_buffers( );
 	}
 
-	vita2d_fini( );
+	cleanup( );
+	sceKernelExitProcess( 0 );
 	return 0;
 }

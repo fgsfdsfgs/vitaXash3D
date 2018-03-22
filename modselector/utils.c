@@ -14,6 +14,14 @@ int isdir( const char *path )
 	return 0;
 }
 
+int fexists( const char *path )
+{
+	FILE *f = fopen( path, "r" );
+	if( !f ) return 0;
+	fclose( f );
+	return 1;
+}
+
 void *fload( const char *path, size_t *fsize )
 {
 	FILE *f = fopen( path, "r" );
