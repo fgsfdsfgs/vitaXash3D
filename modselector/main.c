@@ -128,6 +128,14 @@ static void mod_sort( void )
 
 static vita2d_texture *img_bg;
 static vita2d_pgf *pgf;
+
+static vita2d_texture *fnt_small;
+static const int fnt_small_sz = 12;
+static const int fnt_small_cw[] =
+{
+#include "charwidths.h"
+};
+
 static SceCtrlData pad, pad_old;
 
 #define W 960
@@ -174,6 +182,43 @@ static void gfx_printf( int flags, int x, int y, unsigned int c, float s, const 
 	vita2d_pgf_draw_text( pgf, x, y, c, s, buf );
 }
 
+// NOTE: does not support \n
+static void gfx_printf_small( int flags, int x, int y, unsigned int col, const char *fmt, ... )
+{
+	static char buf[4096];
+
+	va_list argptr;
+	va_start( argptr, fmt );
+	vsnprintf( buf, sizeof(buf), fmt, argptr );
+	va_end( argptr );
+
+	if( !fnt_small ) return;
+
+	// don't care about performance, it's a fucking menu
+	int txtw = 0, txth = fnt_small_sz;
+	for( char *c = buf; *c && c < buf + 4096; ++c )
+		txtw += fnt_small_cw[(uint8_t)(*c)];
+
+	if( flags & P_XCENTER )
+		x -= txtw / 2;
+	else if( flags & P_ARIGHT )
+		x -= txtw;
+
+	if( flags & P_YCENTER )
+		y -= txth / 2;
+	else if( flags & P_ABOTTOM )
+		y -= txth;
+
+	for( char *c = buf; *c && c < buf + 4096; ++c )
+	{
+		int cw = fnt_small_cw[(uint8_t)(*c)];
+		int tx = fnt_small_sz * ((*c) % 16);
+		int ty = fnt_small_sz * ((*c) / 16);
+		vita2d_draw_texture_tint_part( fnt_small, x, y, tx, ty, cw, fnt_small_sz, col );
+		x += cw;
+	}
+}
+
 static void gfx_box( int x, int y, int to_x, int to_y, int w, unsigned int c )
 {
 	vita2d_draw_rectangle( x, y, to_x - x, w, c );
@@ -208,9 +253,11 @@ static inline void cleanup( void )
 
 	if( pgf ) vita2d_free_pgf( pgf );
 	if( img_bg ) vita2d_free_texture( img_bg );
+	if( fnt_small ) vita2d_free_texture( fnt_small );
 
 	pgf = NULL;
 	img_bg = NULL;
+	fnt_small = NULL;
 }
 
 static int die( const char *fmt, ... )
@@ -287,7 +334,7 @@ static void draw( void )
 {
 	if( img_bg ) vita2d_draw_texture( img_bg, 0.f, 0.f );
 
-	gfx_printf( P_ARIGHT | P_ABOTTOM, 960 - 60, 544 - 4, C_LTGREY, 0.75f, "vitaXash3D %s/%s, build date %s %s",
+	gfx_printf_small( P_ARIGHT | P_ABOTTOM, 960 - 4, 544 - 4, C_ORANGE, "vitaXash3D %s/%s, build date %s %s",
 		XASH_VERSION, XASH_BUILD_COMMIT, __DATE__, __TIME__ );
 
 	gfx_printf( P_XCENTER, CX, 544 - 68, C_ORANGE, 1.f, "[^] [v] Select    [x] Run    [\\] Debug mode    [start] Exit" );
@@ -296,16 +343,16 @@ static void draw( void )
 	gfx_box( 60, 160, 960 - 60, 544 - 96, 3, C_DKGREY );
 	// header
 	gfx_printf( 0, 72 + 0, 152, C_LTGREY, 1.f, "Directory" );
-	gfx_printf( 0, 72 + 128, 152, C_LTGREY, 1.f, "DLLs" );
-	gfx_printf( 0, 72 + 224, 152, C_LTGREY, 1.f, "Name" );
+	gfx_printf( 0, 72 + 160, 152, C_LTGREY, 1.f, "DLLs" );
+	gfx_printf( 0, 72 + 256, 152, C_LTGREY, 1.f, "Name" );
 	for( int i = 0; i < nummods; ++i )
 	{
 		int selected = ( menu_sel == i );
 		unsigned int color = selected ? C_YELLOW : C_ORANGE;
 		if( selected ) vita2d_draw_rectangle( 60 + 4, 160 + 4 + i*20, 960 - 60 - 64 - 4, 19, C_BROWN );
 		gfx_printf( P_YCENTER, 72 + 0, 160 + 28 + i*20, color, 1.f, mod_order[i]->dir );
-		gfx_printf( P_YCENTER, 72 + 128, 160 + 28 + i*20, color, 1.f, mod_order[i]->dll );
-		gfx_printf( P_YCENTER, 72 + 224, 160 + 28 + i*20, color, 1.f, mod_order[i]->title );
+		gfx_printf( P_YCENTER, 72 + 160, 160 + 28 + i*20, color, 1.f, mod_order[i]->dll );
+		gfx_printf( P_YCENTER, 72 + 256, 160 + 28 + i*20, color, 1.f, mod_order[i]->title );
 	}
 }
 
@@ -315,6 +362,7 @@ int main( void )
 	vita2d_set_clear_color( C_BLACK );
 	pgf = vita2d_load_default_pgf( );
 	img_bg = vita2d_load_PNG_file( CWD "/launcher/bg.png" );
+	fnt_small = vita2d_load_PNG_file( CWD "/launcher/fnt_small.png" );
 
 	if( !mod_scan( ) )
 		die( "Could not scan directory \"" CWD "\":\n%s", strerror( errno ) );
