@@ -136,6 +136,9 @@ static const int fnt_small_cw[] =
 #include "charwidths.h"
 };
 
+static vita2d_texture *fnt_buttons;
+static const int fnt_buttons_sz = 16;
+
 static SceCtrlData pad, pad_old;
 
 #define W 960
@@ -157,7 +160,7 @@ const unsigned int C_BLACK = RGBA8( 0, 0, 0, 255 );
 const unsigned int C_GREEN = RGBA8( 0, 255, 0, 255 );
 const unsigned int C_YELLOW = RGBA8( 255, 255, 0, 255 );
 const unsigned int C_ORANGE = RGBA8( 255, 180, 0, 255 );
-const unsigned int C_BROWN = RGBA8( 80, 64, 25, 200 );
+const unsigned int C_BROWN = RGBA8( 80, 64, 25, 225 );
 
 static void gfx_printf( int flags, int x, int y, unsigned int c, float s, const char *fmt, ... )
 {
@@ -254,10 +257,12 @@ static inline void cleanup( void )
 	if( pgf ) vita2d_free_pgf( pgf );
 	if( img_bg ) vita2d_free_texture( img_bg );
 	if( fnt_small ) vita2d_free_texture( fnt_small );
+	if( fnt_buttons ) vita2d_free_texture( fnt_buttons );
 
 	pgf = NULL;
 	img_bg = NULL;
 	fnt_small = NULL;
+	fnt_buttons = NULL;
 }
 
 static int die( const char *fmt, ... )
@@ -337,7 +342,18 @@ static void draw( void )
 	gfx_printf_small( P_ARIGHT | P_ABOTTOM, 960 - 4, 544 - 4, C_ORANGE, "vitaXash3D %s/%s, build date %s %s",
 		XASH_VERSION, XASH_BUILD_COMMIT, __DATE__, __TIME__ );
 
-	gfx_printf( P_XCENTER, CX, 544 - 68, C_ORANGE, 1.f, "[^] [v] Select    [x] Run    [\\] Debug mode    [start] Exit" );
+	if( fnt_buttons )
+	{
+		vita2d_draw_texture_tint_part( fnt_buttons, 223, 459, 0, 21, 21, 21, C_ORANGE );
+		vita2d_draw_texture_tint_part( fnt_buttons, 250, 459, 21, 21, 21, 21, C_ORANGE );
+		vita2d_draw_texture_tint_part( fnt_buttons, 367, 459, 0, 0, 21, 21, C_ORANGE );
+		vita2d_draw_texture_tint_part( fnt_buttons, 462, 459, 64, 0, 21, 21, C_ORANGE );
+		vita2d_draw_texture_tint_part( fnt_buttons, 648, 460, 42, 64, 42, 21, C_ORANGE );
+		gfx_printf( 0, 280, 476, C_LTGREY, 1.f, "Select" );
+		gfx_printf( 0, 396, 476, C_LTGREY, 1.f, "Run" );
+		gfx_printf( 0, 490, 476, C_LTGREY, 1.f, "Debug mode" );
+		gfx_printf( 0, 698, 476, C_LTGREY, 1.f, "Exit" );
+	}
 
 	// game table //
 	gfx_box( 60, 160, 960 - 60, 544 - 96, 3, C_DKGREY );
@@ -363,6 +379,7 @@ int main( void )
 	pgf = vita2d_load_default_pgf( );
 	img_bg = vita2d_load_PNG_file( CWD "/launcher/bg.png" );
 	fnt_small = vita2d_load_PNG_file( CWD "/launcher/fnt_small.png" );
+	fnt_buttons = vita2d_load_PNG_file( CWD "/launcher/fnt_buttons.png" );
 
 	if( !mod_scan( ) )
 		die( "Could not scan directory \"" CWD "\":\n%s", strerror( errno ) );
