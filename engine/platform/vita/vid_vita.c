@@ -39,7 +39,6 @@ extern qboolean vita_keyboard_on;
 void Vita_BeginFrame( void )
 {
 	vglStartRendering( );
-	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices );
 }
 
 void Vita_EndFrame( void )
@@ -98,7 +97,7 @@ void GL_UpdateSwapInterval( void )
 	{
 		gl_swapInterval->modified = false;
 		MsgDev( D_INFO, "GL_UpdateSwapInterval: %d\n", gl_swapInterval->integer );
-		// vglWaitVblankStart( gl_swapInterval->integer );
+		vglWaitVblankStart( gl_swapInterval->integer );
 	}
 }
 
@@ -301,7 +300,7 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 
 	host.window_center_x = width / 2;
 	host.window_center_y = height / 2;
-	
+
 	glState.wideScreen = true; // V_AdjustFov will check for widescreen
 
 	return rserr_ok;
@@ -318,7 +317,6 @@ void VID_RestoreScreenResolution( void )
 
 }
 
-
 /*
 ==================
 VID_SetMode
@@ -328,9 +326,63 @@ Set the described video mode
 */
 qboolean VID_SetMode( void )
 {
-	int width = 960, height = 544;
-	MsgDev( D_NOTE, "VID_SetMode(%d, %d)\n", width, height);
-	R_ChangeDisplaySettings( width, height, false );
+	qboolean	fullscreen = false;
+	int iScreenWidth, iScreenHeight;
+	rserr_t	err;
+
+	Cvar_SetFloat( "fullscreen", 1 );
+
+	if( vid_mode->modified && vid_mode->integer >= 0 && vid_mode->integer <= num_vidmodes )
+	{
+		iScreenWidth = vidmode[vid_mode->integer].width;
+		iScreenHeight = vidmode[vid_mode->integer].height;
+	}
+	else
+	{
+		iScreenWidth = 960;
+		iScreenHeight = 544;
+	}
+
+	gl_swapInterval->modified = true;
+	fullscreen = Cvar_VariableInteger("fullscreen") != 0;
+
+	if(( err = R_ChangeDisplaySettings( iScreenWidth, iScreenHeight, fullscreen )) == rserr_ok )
+	{
+		glConfig.prev_width = iScreenWidth;
+		glConfig.prev_height = iScreenHeight;
+	}
+	else
+	{
+		if( err == rserr_invalid_fullscreen )
+		{
+			Cvar_SetFloat( "fullscreen", 0 );
+			MsgDev( D_ERROR, "VID_SetMode: fullscreen unavailable in this mode\n" );
+			Sys_Warn("fullscreen unavailable in this mode!");
+			if(( err = R_ChangeDisplaySettings( iScreenWidth, iScreenHeight, false )) == rserr_ok )
+				return true;
+		}
+		else if( err == rserr_invalid_mode )
+		{
+			Cvar_SetFloat( "vid_mode", glConfig.prev_mode );
+			MsgDev( D_ERROR, "VID_SetMode: invalid mode\n" );
+			Sys_Warn("invalid mode");
+		}
+
+		// try setting it back to something safe
+		if(( err = R_ChangeDisplaySettings( glConfig.prev_width, glConfig.prev_height, false )) != rserr_ok )
+		{
+			MsgDev( D_ERROR, "VID_SetMode: could not revert to safe mode\n" );
+			Sys_Warn("could not revert to safe mode!");
+			return false;
+		}
+	}
+
+	if( glw_state.initialized )
+	{
+		// can't change res on the fly, so restart the whole fucking game
+		Sys_Restart( );
+	}
+
 	return true;
 }
 
@@ -351,15 +403,20 @@ qboolean R_Init_OpenGL( void )
 	gl_vgl_colors = calloc( MAX_VGL_ARRAYSIZE * 4, sizeof( GLfloat ) );
 	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
-	vglInit( 0x800000 );
+	qboolean ret = VID_SetMode();
+
+	vglInitExtended( 0x800000, glState.width, glState.height, 0x1000000 );
 	vglUseVram( GL_TRUE );
 	vglWaitVblankStart( GL_TRUE );
+	vglMapHeapMem( );
+
+	vglIndexPointerMapped( gl_vgl_indices );
 
 	Vita_ReloadShaders( );
 	Vita_EnableGLState( GL_ALPHA_TEST );
 	Vita_EnableGLState( GL_TEXTURE_COORD_ARRAY );
 
-	return VID_SetMode();
+	return ret;
 }
 
 
@@ -617,21 +674,6 @@ void Vita_DrawGLPoly( GLenum prim, int num, GLboolean implicit_wvp )
 	else if( (state_mask + texenv_mask) == 0x0D ) glUniform4fv( u_modcolor[1], 1, cur_color );
 	else if( just_color ) glUniform4fv( u_monocolor, 1, cur_color );
 	vglDrawObjects( prim, num, implicit_wvp );
-}
-
-void Vita_VertexPointer( int count, GLenum type, int stride, int num, void *ptr )
-{
-	vglVertexAttribPointer( 0, count, type, GL_FALSE, 0, num, ptr );
-}
-
-void Vita_TexCoordPointer( int count, GLenum type, int stride, int num, void *ptr )
-{
-	vglVertexAttribPointer( 1, count, type, GL_FALSE, 0, num, ptr );
-}
-
-void Vita_ColorPointer( int count, GLenum type, int stride, int num, void *ptr )
-{
-	vglVertexAttribPointer( 2, count, type, GL_FALSE, 0, num, ptr );
 }
 
 // HACKHACKHACK: GL function wrappers to go with this shit

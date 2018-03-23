@@ -93,6 +93,15 @@ glconfig_t	glConfig;
 glstate_t		glState;
 glwstate_t	glw_state;
 
+#ifdef __vita__
+vidmode_t vidmode[] =
+{
+{ "Mode  0: 16x9",	480,	272,	true	},
+{ "Mode  1: 16x9",	640,	368,	true	},
+{ "Mode  2: 16x9",	720,	408,	true	},
+{ "Mode  3: 16x9",	960,	544,	true	},
+};
+#else
 vidmode_t vidmode[] =
 {
 { "Mode  0: 4x3",	640,	480,	false	},
@@ -120,6 +129,7 @@ vidmode_t vidmode[] =
 { "Mode 22: 16x10",	2560,	1600,	true	},
 { "Mode 23: 16x9",	1600,	900,	true	},
 };
+#endif
 
 int num_vidmodes = ( sizeof( vidmode ) / sizeof( vidmode[0] ));
 

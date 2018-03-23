@@ -2374,6 +2374,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	Vita_TexCoordPointer( 2, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycoord );
 	Vita_ColorPointer( 4, GL_FLOAT, 0, g_nNumArrayVerts, g_xarraycolor );
 	Vita_DrawGLPoly( GL_TRIANGLES, g_nNumArrayElems, GL_TRUE );
+	vglIndexPointerMapped( gl_vgl_indices );
 #else
 	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
 	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
@@ -3727,9 +3728,6 @@ R_DrawStudioModel
 void R_DrawStudioModel( cl_entity_t *e )
 {
 	R_DrawStudioModelInternal( e, false );
-#ifdef __vita__
-	vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices ); // HACK: restore index pointer
-#endif
 }
 
 /*

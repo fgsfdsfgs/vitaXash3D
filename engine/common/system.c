@@ -688,6 +688,7 @@ void Sys_Break( const char *format, ... )
 
 	Sys_Quit();
 }
+
 /*
 ================
 Sys_Quit2
@@ -703,6 +704,31 @@ void Sys_Quit( void )
 	exit( host.crashed );
 #endif
 }
+
+#ifdef __vita__
+/*
+================
+Sys_Restart
+================
+*/
+void Sys_Restart( void )
+{
+	extern int g_iArgc;
+	extern char **g_pszArgv;
+
+	char *args[17] = { NULL };
+	int argc = g_iArgc > 16 ? 16 : g_iArgc;
+
+	for( int i = 0; i < argc && i < 16; ++i )
+		args[i] = g_pszArgv[i];
+	args[argc] = NULL;
+
+	MsgDev( D_INFO, "Restarting...\n" );
+	Host_Shutdown();
+
+	sceAppMgrLoadExec( "app0:/xash.bin", args, NULL );
+}
+#endif
 
 /*
 ================

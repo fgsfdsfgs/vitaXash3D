@@ -116,6 +116,9 @@ void Sys_InitLog( void );
 void Sys_CloseLog( void );
 void Sys_Quit( void );
 int Sys_LogFileNo( void );
+#ifdef __vita__
+void Sys_Restart( void );
+#endif
 
 //
 // sys_con.c

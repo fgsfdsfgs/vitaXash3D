@@ -298,10 +298,6 @@ void R_Set2DMode( qboolean enable )
 		pglDisable( GL_DEPTH_TEST );
 		pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
-#ifdef __vita__
-		vglIndexPointer( GL_SHORT, 0, MAX_VGL_ARRAYSIZE, gl_vgl_indices ); // HACK: restore index pointer
-#endif
-
 		glState.in2DMode = true;
 		RI.currententity = NULL;
 		RI.currentmodel = NULL;

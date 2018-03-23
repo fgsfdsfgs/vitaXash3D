@@ -46,8 +46,21 @@ void Vita_EnableGLState( int state );
 void Vita_DisableGLState( int state );
 void Vita_ReloadShaders( void );
 void Vita_FreeShaders( void );
-void Vita_VertexPointer( int count, GLenum type, int stride, int num, void *ptr );
-void Vita_TexCoordPointer( int count, GLenum type, int stride, int num, void *ptr );
-void Vita_ColorPointer( int count, GLenum type, int stride, int num, void *ptr );
+
+static inline void Vita_VertexPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 0, count, type, GL_FALSE, 0, num, ptr );
+}
+
+static inline void Vita_TexCoordPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 1, count, type, GL_FALSE, 0, num, ptr );
+}
+
+static inline void Vita_ColorPointer( int count, GLenum type, int stride, int num, void *ptr )
+{
+	vglVertexAttribPointer( 2, count, type, GL_FALSE, 0, num, ptr );
+}
+
 
 #endif

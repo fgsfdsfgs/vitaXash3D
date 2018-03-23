@@ -37,6 +37,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_VIDMODES	(sizeof( uiVideoModes ) / sizeof( uiVideoModes[0] )) + 1
 
+#ifdef __vita__
+static const char *uiVideoModes[] =
+{
+	"480 x 272 (wide)",
+	"640 x 368 (wide)",
+	"720 x 408 (wide)",
+	"960 x 544 (wide)",
+};
+#else
 static const char *uiVideoModes[] =
 {
 	"640 x 480",
@@ -64,6 +73,7 @@ static const char *uiVideoModes[] =
 	"2560 x 1600 (wide)",
 	"1600 x 900 (wide)",
 };
+#endif
 
 typedef struct
 {
@@ -204,7 +214,11 @@ static void UI_VidModes_Init( void )
 	uiVidModes.ok.generic.x = 72;
 	uiVidModes.ok.generic.y = 230;
 	uiVidModes.ok.generic.name = "Apply";
+#ifdef __vita__
+	uiVidModes.ok.generic.statusText = "Apply changes and restart game";
+#else
 	uiVidModes.ok.generic.statusText = "Apply changes";
+#endif
 	uiVidModes.ok.generic.callback = UI_VidModes_Callback;
 
 	UI_UtilSetupPicButton( &uiVidModes.ok, PC_OK );
