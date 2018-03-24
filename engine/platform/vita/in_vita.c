@@ -86,17 +86,29 @@ static inline void utf2ascii( char *dst, uint16_t *src, int dstsize )
 	*dst = 0x00;
 }
 
-static inline void RadialDeadzone( int *x, int *y, int dead )
+
+static void RescaleAnalog( int *x, int *y, int dead )
 {
-	float analogX = (float) *x;
-	float analogY = (float) *y;
+	//radial and scaled deadzone
+	//http://www.third-helix.com/2013/04/12/doing-thumbstick-dead-zones-right.html
+	float analogX = (float)*x;
+	float analogY = (float)*y;
+	float deadZone = (float)dead;
+	float maximum = 128.0f;
 	float magnitude = sqrt( analogX * analogX + analogY * analogY );
-	if( magnitude <= dead )
+	if( magnitude >= deadZone )
+	{
+		float scalingFactor = maximum / magnitude * ( magnitude - deadZone ) / ( maximum - deadZone );
+		*x = (int)( analogX * scalingFactor );
+		*y = (int)( analogY * scalingFactor );
+	}
+	else
 	{
 		*x = 0;
 		*y = 0;
 	}
 }
+
 
 static inline void UpdateAxes( void )
 {
@@ -107,12 +119,23 @@ static inline void UpdateAxes( void )
 
 	if( abs( left_x ) < vita_deadzone_l ) left_x = 0;
 	if( abs( left_y ) < vita_deadzone_l ) left_y = 0;
-	RadialDeadzone( &right_x, &right_y, vita_deadzone_r );
 
-	Joy_AxisMotionEvent( 0, 0, left_x * 255 );
-	Joy_AxisMotionEvent( 0, 1, left_y * 255 );
-	Joy_AxisMotionEvent( 0, 2, right_x * -255 );
-	Joy_AxisMotionEvent( 0, 3, right_y * -255 );
+	RescaleAnalog( &right_x, &right_y, vita_deadzone_r );
+
+	if( left_x < -128 ) left_x = -128;
+	else if( left_x > 127 ) left_x = 127;
+	if( left_y < -128 ) left_y = -128;
+	else if( left_y > 127 ) left_y = 127;
+
+	if( right_x < -127 ) right_x = -127;
+	else if( right_x > 128 ) right_x = 128;
+	if( right_y < -127 ) right_y = -127;
+	else if( right_y > 128 ) right_y = 128;
+
+	Joy_AxisMotionEvent( 0, 0, left_x * 256 );
+	Joy_AxisMotionEvent( 0, 1, left_y * 256 );
+	Joy_AxisMotionEvent( 0, 2, right_x * -256 );
+	Joy_AxisMotionEvent( 0, 3, right_y * -256 );
 }
 
 static inline void UpdateButtons( void )
