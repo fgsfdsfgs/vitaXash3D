@@ -95,7 +95,7 @@ static void RescaleAnalog( int *x, int *y, int dead )
 	float analogY = (float)*y;
 	float deadZone = (float)dead;
 	float maximum = 128.0f;
-	float magnitude = sqrt( analogX * analogX + analogY * analogY );
+	float magnitude = sqrtf( analogX * analogX + analogY * analogY );
 	if( magnitude >= deadZone )
 	{
 		float scalingFactor = maximum / magnitude * ( magnitude - deadZone ) / ( maximum - deadZone );
