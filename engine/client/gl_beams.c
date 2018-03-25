@@ -958,9 +958,9 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 	pglBegin( GL_TRIANGLES );
 #endif
 
-	while( pHead )
-	{
 #ifdef __vita__
+	while( pHead && ( numverts <= MAX_VGL_ARRAYSIZE-6 ) )
+	{
 		*(colp++) = nColor[0]; *(colp++) = nColor[1]; *(colp++) = nColor[2]; *(colp++) = 1.f;
 		*(uvp++) = 1.f; *(uvp++) = 1.f;
 		*(vertp++) = last2[0]; *(vertp++) = last2[1]; *(vertp++) = last2[2];
@@ -971,6 +971,8 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 		*(vertp++) = last1[0]; *(vertp++) = last1[1]; *(vertp++) = last1[2];
 		numverts++;
 #else
+	while( pHead )
+	{
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 1.0f, 1.0f );
 		pglVertex3fv( last2 );

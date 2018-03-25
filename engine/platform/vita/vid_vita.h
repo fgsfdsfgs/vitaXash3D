@@ -6,7 +6,7 @@
 #include "../platform/vita/gl_stubs.h"
 #include "../platform/vita/gl_mangle.h"
 
-#define MAX_VGL_ARRAYSIZE 256 // TODO: is this too much or too little?
+#define MAX_VGL_ARRAYSIZE 1024
 
 // SHADERS
 // fragment shaders
