@@ -257,6 +257,11 @@ char *Sys_GetCurrentUser( void )
 	if( pw )
 		return pw->pw_name;
 
+#elif defined(__vita__)
+	static string username;
+	sceAppUtilSystemParamGetString( SCE_SYSTEM_PARAM_ID_USERNAME, username, SCE_SYSTEM_PARAM_USERNAME_MAXSIZE );
+	if( username[0] ) return username;
+
 #endif
 	return "Player";
 }
