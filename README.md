@@ -42,11 +42,18 @@ If you're trying to connect to an online server from the server list and you get
 
 Some Xash servers automatically ban people connecting from a device other than an Android or iOS smartphone, nothing can be done about that.
 
+Changing the video mode (screen resolution) immediately restarts the game. You can also change it by editing your mod's `video.cfg`.
+Keep in mind that some mods, like Counter-Strike, were not meant to be played in a resolution smaller than 640x400.
+
+To change your name either enter `name my_name` in the console or change `name` in your mod's `config.cfg`.
+
+You can change the layout of on-screen touch buttons by using the "Editor" function in the "Touch buttons" menu.
+
 #### Available game libraries
 * [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2)
 * [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (included in vitaXash3D releases after v2)
 * [Opposing Force](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/opfor) (included in vitaXash3D releases after v2)
-* [Counter-Strike] (https://github.com/fgsfdsfgs/cs16-client/tree/v1.32) (included in vitaXash3D releases after v3)
+* [Counter-Strike] (https://github.com/fgsfdsfgs/cs16-client/tree/v1.32) (client only, included in vitaXash3D releases after v3)
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS and game DLL source code;
