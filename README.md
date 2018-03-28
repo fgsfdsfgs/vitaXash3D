@@ -53,7 +53,8 @@ You can change the layout of on-screen touch buttons by using the "Editor" funct
 * [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2)
 * [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (included in vitaXash3D releases after v2)
 * [Opposing Force](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/opfor) (included in vitaXash3D releases after v2)
-* [Counter-Strike](https://github.com/fgsfdsfgs/cs16-client/tree/v1.32) (client only, included in vitaXash3D releases after v3)
+* [Counter-Strike client](https://github.com/fgsfdsfgs/cs16-client/tree/v1.32) (included in vitaXash3D releases after v3)
+* [Counter-Strike server](https://github.com/fgsfdsfgs/regamelite) (ReGameLite, includes ZBot, unstable)
 
 ## Credits
 - Uncle Mike & co for Xash3D and FWGS team for Xash3D-FWGS and game DLL source code;
