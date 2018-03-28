@@ -594,8 +594,10 @@ void CL_ParseServerData( sizebuf_t *msg )
 	Q_strncpy( gamefolder, BF_ReadString( msg ), MAX_STRING );
 	host.features = (uint)BF_ReadLong( msg );
 
+#ifndef __vita__ // don't need this, vitaXash always enables console
 	if( cl.maxclients > 1 && host.developer < 1 )
 		host.developer++;
+#endif
 
 	// set the background state
 	if( cls.demoplayback && ( cls.demonum != -1 ))
