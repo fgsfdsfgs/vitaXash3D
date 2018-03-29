@@ -24,8 +24,8 @@ GNU General Public License for more details.
 #include "in_vita.h"
 #include <vitasdk.h>
 
-static int vita_deadzone_l = 30;
-static int vita_deadzone_r = 30;
+static int vita_deadzone_l = 32;
+static int vita_deadzone_r = 32;
 static SceCtrlData pad, pad_old;
 
 static SceTouchData touch_front, touch_back;
