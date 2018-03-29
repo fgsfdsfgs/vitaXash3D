@@ -49,6 +49,8 @@ To change your name either enter `name my_name` in the console or change `name` 
 
 You can change the layout of on-screen touch buttons by using the "Editor" function in the "Touch buttons" menu.
 
+Expect every new release to invalidate at least some of your old save files. Pretty much nothing can be done about this right now, as saves are function offset based, and those offsets change with almost every code change.
+
 #### Available game libraries
 * [Half-Life](https://github.com/fgsfdsfgs/hlsdk-xash3d) (included in vitaXash3D releases after v2)
 * [Blue Shift](https://github.com/fgsfdsfgs/hlsdk-xash3d/tree/bshift) (included in vitaXash3D releases after v2)
