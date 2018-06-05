@@ -5,7 +5,7 @@ A port of Xash3D-FWGS to the PSVita.
 This port is still a work in progress. Expect graphics and sound glitches, crashes and gameplay oddities.
 
 ## Requirements
-- VitaSDK (in PATH and with VITASDK set);
+- Vita SDK Toolchain (use [VDPM](https://github.com/vitasdk/vdpm) for installing)
 - Latest version of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
 
 ## Building
