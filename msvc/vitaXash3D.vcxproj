@@ -1,0 +1,397 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{998A12B8-AFAF-4CD8-8227-D8137B5B0DA8}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeBuildCommandLine>
+    </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>
+    </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>
+    </NMakeCleanCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeBuildCommandLine>
+    </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>
+    </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>
+    </NMakeCleanCommandLine>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\engine\client\cl_cmds.c" />
+    <ClCompile Include="..\engine\client\cl_demo.c" />
+    <ClCompile Include="..\engine\client\cl_events.c" />
+    <ClCompile Include="..\engine\client\cl_frame.c" />
+    <ClCompile Include="..\engine\client\cl_game.c" />
+    <ClCompile Include="..\engine\client\cl_main.c" />
+    <ClCompile Include="..\engine\client\cl_menu.c" />
+    <ClCompile Include="..\engine\client\cl_mobile.c" />
+    <ClCompile Include="..\engine\client\cl_parse.c" />
+    <ClCompile Include="..\engine\client\cl_pmove.c" />
+    <ClCompile Include="..\engine\client\cl_remap.c" />
+    <ClCompile Include="..\engine\client\cl_scrn.c" />
+    <ClCompile Include="..\engine\client\cl_tent.c" />
+    <ClCompile Include="..\engine\client\cl_video.c" />
+    <ClCompile Include="..\engine\client\cl_view.c" />
+    <ClCompile Include="..\engine\client\console.c" />
+    <ClCompile Include="..\engine\client\gamma.c" />
+    <ClCompile Include="..\engine\client\gl_backend.c" />
+    <ClCompile Include="..\engine\client\gl_beams.c" />
+    <ClCompile Include="..\engine\client\gl_cull.c" />
+    <ClCompile Include="..\engine\client\gl_decals.c" />
+    <ClCompile Include="..\engine\client\gl_draw.c" />
+    <ClCompile Include="..\engine\client\gl_image.c" />
+    <ClCompile Include="..\engine\client\gl_mirror.c" />
+    <ClCompile Include="..\engine\client\gl_refrag.c" />
+    <ClCompile Include="..\engine\client\gl_rlight.c" />
+    <ClCompile Include="..\engine\client\gl_rmain.c" />
+    <ClCompile Include="..\engine\client\gl_rmath.c" />
+    <ClCompile Include="..\engine\client\gl_rmisc.c" />
+    <ClCompile Include="..\engine\client\gl_rpart.c" />
+    <ClCompile Include="..\engine\client\gl_rsurf.c" />
+    <ClCompile Include="..\engine\client\gl_sprite.c" />
+    <ClCompile Include="..\engine\client\gl_studio.c" />
+    <ClCompile Include="..\engine\client\gl_warp.c" />
+    <ClCompile Include="..\engine\client\input.c" />
+    <ClCompile Include="..\engine\client\input_evdevkey.c" />
+    <ClCompile Include="..\engine\client\joyinput.c" />
+    <ClCompile Include="..\engine\client\keys.c" />
+    <ClCompile Include="..\engine\client\s_dsp.c" />
+    <ClCompile Include="..\engine\client\s_load.c" />
+    <ClCompile Include="..\engine\client\s_main.c" />
+    <ClCompile Include="..\engine\client\s_mix.c" />
+    <ClCompile Include="..\engine\client\s_mouth.c" />
+    <ClCompile Include="..\engine\client\s_stream.c" />
+    <ClCompile Include="..\engine\client\s_stub.c" />
+    <ClCompile Include="..\engine\client\s_utils.c" />
+    <ClCompile Include="..\engine\client\s_vox.c" />
+    <ClCompile Include="..\engine\client\touch.c" />
+    <ClCompile Include="..\engine\client\vgui\vgui_draw.c" />
+    <ClCompile Include="..\engine\client\vid_common.c" />
+    <ClCompile Include="..\engine\common\avikit.c" />
+    <ClCompile Include="..\engine\common\base_cmd.c" />
+    <ClCompile Include="..\engine\common\build.c" />
+    <ClCompile Include="..\engine\common\cfgscript.c" />
+    <ClCompile Include="..\engine\common\cmd.c" />
+    <ClCompile Include="..\engine\common\common.c" />
+    <ClCompile Include="..\engine\common\con_utils.c" />
+    <ClCompile Include="..\engine\common\crashhandler.c" />
+    <ClCompile Include="..\engine\common\crclib.c" />
+    <ClCompile Include="..\engine\common\crtlib.c" />
+    <ClCompile Include="..\engine\common\cvar.c" />
+    <ClCompile Include="..\engine\common\dedicated.c" />
+    <ClCompile Include="..\engine\common\filesystem.c" />
+    <ClCompile Include="..\engine\common\host.c" />
+    <ClCompile Include="..\engine\common\hpak.c" />
+    <ClCompile Include="..\engine\common\identification.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_bmp.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_dds.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_main.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_quant.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_tga.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_utils.c" />
+    <ClCompile Include="..\engine\common\imagelib\img_wad.c" />
+    <ClCompile Include="..\engine\common\infostring.c" />
+    <ClCompile Include="..\engine\common\launcher.c" />
+    <ClCompile Include="..\engine\common\library.c" />
+    <ClCompile Include="..\engine\common\mathlib.c" />
+    <ClCompile Include="..\engine\common\matrixlib.c" />
+    <ClCompile Include="..\engine\common\model.c" />
+    <ClCompile Include="..\engine\common\mod_studio.c" />
+    <ClCompile Include="..\engine\common\network.c" />
+    <ClCompile Include="..\engine\common\net_buffer.c" />
+    <ClCompile Include="..\engine\common\net_chan.c" />
+    <ClCompile Include="..\engine\common\net_encode.c" />
+    <ClCompile Include="..\engine\common\net_huff.c" />
+    <ClCompile Include="..\engine\common\pm_surface.c" />
+    <ClCompile Include="..\engine\common\pm_trace.c" />
+    <ClCompile Include="..\engine\common\random.c" />
+    <ClCompile Include="..\engine\common\Sequence.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\common.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\dct64_i386.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\decode_i386.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\interface.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\layer2.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\layer3.c" />
+    <ClCompile Include="..\engine\common\soundlib\libmpg\tabinit.c" />
+    <ClCompile Include="..\engine\common\soundlib\snd_main.c" />
+    <ClCompile Include="..\engine\common\soundlib\snd_mp3.c" />
+    <ClCompile Include="..\engine\common\soundlib\snd_utils.c" />
+    <ClCompile Include="..\engine\common\soundlib\snd_wav.c" />
+    <ClCompile Include="..\engine\common\system.c" />
+    <ClCompile Include="..\engine\common\sys_con.c" />
+    <ClCompile Include="..\engine\common\titles.c" />
+    <ClCompile Include="..\engine\common\world.c" />
+    <ClCompile Include="..\engine\common\zone.c" />
+    <ClCompile Include="..\engine\platform\android\android.c" />
+    <ClCompile Include="..\engine\platform\android\android_nosdl.c" />
+    <ClCompile Include="..\engine\platform\android\dlsym-weak.cpp" />
+    <ClCompile Include="..\engine\platform\android\snd_opensles.c" />
+    <ClCompile Include="..\engine\platform\android\vid_android.c" />
+    <ClCompile Include="..\engine\platform\sdl\events.c" />
+    <ClCompile Include="..\engine\platform\sdl\snd_sdl.c" />
+    <ClCompile Include="..\engine\platform\sdl\vid_sdl.c" />
+    <ClCompile Include="..\engine\platform\sdl\vid_sdl_nanogl.c" />
+    <ClCompile Include="..\engine\platform\vita\dll_vita.c" />
+    <ClCompile Include="..\engine\platform\vita\in_vita.c" />
+    <ClCompile Include="..\engine\platform\vita\snd_vita.c" />
+    <ClCompile Include="..\engine\platform\vita\vid_vita.c" />
+    <ClCompile Include="..\engine\platform\win32\con_win.c" />
+    <ClCompile Include="..\engine\server\sv_client.c" />
+    <ClCompile Include="..\engine\server\sv_cmds.c" />
+    <ClCompile Include="..\engine\server\sv_custom.c" />
+    <ClCompile Include="..\engine\server\sv_frame.c" />
+    <ClCompile Include="..\engine\server\sv_game.c" />
+    <ClCompile Include="..\engine\server\sv_init.c" />
+    <ClCompile Include="..\engine\server\sv_log.c" />
+    <ClCompile Include="..\engine\server\sv_main.c" />
+    <ClCompile Include="..\engine\server\sv_move.c" />
+    <ClCompile Include="..\engine\server\sv_phys.c" />
+    <ClCompile Include="..\engine\server\sv_pmove.c" />
+    <ClCompile Include="..\engine\server\sv_save.c" />
+    <ClCompile Include="..\engine\server\sv_world.c" />
+    <ClCompile Include="..\mainui\basemenu.cpp" />
+    <ClCompile Include="..\mainui\legacy\menu_playdemo.cpp" />
+    <ClCompile Include="..\mainui\legacy\menu_playrec.cpp" />
+    <ClCompile Include="..\mainui\legacy\menu_recdemo.cpp" />
+    <ClCompile Include="..\mainui\menu_advcontrols.cpp" />
+    <ClCompile Include="..\mainui\menu_audio.cpp" />
+    <ClCompile Include="..\mainui\menu_btns.cpp" />
+    <ClCompile Include="..\mainui\menu_configuration.cpp" />
+    <ClCompile Include="..\mainui\menu_controls.cpp" />
+    <ClCompile Include="..\mainui\menu_creategame.cpp" />
+    <ClCompile Include="..\mainui\menu_credits.cpp" />
+    <ClCompile Include="..\mainui\menu_customgame.cpp" />
+    <ClCompile Include="..\mainui\menu_filedialog.cpp" />
+    <ClCompile Include="..\mainui\menu_gameoptions.cpp" />
+    <ClCompile Include="..\mainui\menu_gamepad.cpp" />
+    <ClCompile Include="..\mainui\menu_internetgames.cpp" />
+    <ClCompile Include="..\mainui\menu_langame.cpp" />
+    <ClCompile Include="..\mainui\menu_loadgame.cpp" />
+    <ClCompile Include="..\mainui\menu_main.cpp" />
+    <ClCompile Include="..\mainui\menu_multiplayer.cpp" />
+    <ClCompile Include="..\mainui\menu_newgame.cpp" />
+    <ClCompile Include="..\mainui\menu_playersetup.cpp" />
+    <ClCompile Include="..\mainui\menu_savegame.cpp" />
+    <ClCompile Include="..\mainui\menu_saveload.cpp" />
+    <ClCompile Include="..\mainui\menu_strings.cpp" />
+    <ClCompile Include="..\mainui\menu_touch.cpp" />
+    <ClCompile Include="..\mainui\menu_touchbuttons.cpp" />
+    <ClCompile Include="..\mainui\menu_touchedit.cpp" />
+    <ClCompile Include="..\mainui\menu_touchoptions.cpp" />
+    <ClCompile Include="..\mainui\menu_video.cpp" />
+    <ClCompile Include="..\mainui\menu_vidmodes.cpp" />
+    <ClCompile Include="..\mainui\menu_vidoptions.cpp" />
+    <ClCompile Include="..\mainui\udll_int.cpp" />
+    <ClCompile Include="..\mainui\ui_title_anim.cpp" />
+    <ClCompile Include="..\mainui\utils.cpp" />
+    <ClCompile Include="..\modselector\main.c" />
+    <ClCompile Include="..\modselector\utils.c" />
+    <ClCompile Include="..\vgui_support\vgui_clip.cpp" />
+    <ClCompile Include="..\vgui_support\vgui_font.cpp" />
+    <ClCompile Include="..\vgui_support\vgui_input.cpp" />
+    <ClCompile Include="..\vgui_support\vgui_int.cpp" />
+    <ClCompile Include="..\vgui_support\vgui_surf.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\backends.h" />
+    <ClInclude Include="..\common\beamdef.h" />
+    <ClInclude Include="..\common\bspfile.h" />
+    <ClInclude Include="..\common\cl_entity.h" />
+    <ClInclude Include="..\common\com_model.h" />
+    <ClInclude Include="..\common\const.h" />
+    <ClInclude Include="..\common\con_nprint.h" />
+    <ClInclude Include="..\common\cvardef.h" />
+    <ClInclude Include="..\common\defaults.h" />
+    <ClInclude Include="..\common\demo_api.h" />
+    <ClInclude Include="..\common\dlight.h" />
+    <ClInclude Include="..\common\engine_features.h" />
+    <ClInclude Include="..\common\entity_state.h" />
+    <ClInclude Include="..\common\entity_types.h" />
+    <ClInclude Include="..\common\event_api.h" />
+    <ClInclude Include="..\common\event_args.h" />
+    <ClInclude Include="..\common\event_flags.h" />
+    <ClInclude Include="..\common\gameinfo.h" />
+    <ClInclude Include="..\common\hltv.h" />
+    <ClInclude Include="..\common\ivoicetweak.h" />
+    <ClInclude Include="..\common\kbutton.h" />
+    <ClInclude Include="..\common\lightstyle.h" />
+    <ClInclude Include="..\common\mathlib.h" />
+    <ClInclude Include="..\common\netadr.h" />
+    <ClInclude Include="..\common\net_api.h" />
+    <ClInclude Include="..\common\particledef.h" />
+    <ClInclude Include="..\common\pmtrace.h" />
+    <ClInclude Include="..\common\port.h" />
+    <ClInclude Include="..\common\qfont.h" />
+    <ClInclude Include="..\common\ref_params.h" />
+    <ClInclude Include="..\common\render_api.h" />
+    <ClInclude Include="..\common\r_efx.h" />
+    <ClInclude Include="..\common\r_studioint.h" />
+    <ClInclude Include="..\common\screenfade.h" />
+    <ClInclude Include="..\common\studio_event.h" />
+    <ClInclude Include="..\common\triangleapi.h" />
+    <ClInclude Include="..\common\types.h" />
+    <ClInclude Include="..\common\usercmd.h" />
+    <ClInclude Include="..\common\wadfile.h" />
+    <ClInclude Include="..\common\weaponinfo.h" />
+    <ClInclude Include="..\common\wrect.h" />
+    <ClInclude Include="..\engine\anorms.h" />
+    <ClInclude Include="..\engine\cdll_exp.h" />
+    <ClInclude Include="..\engine\cdll_int.h" />
+    <ClInclude Include="..\engine\client\anorm_dots.h" />
+    <ClInclude Include="..\engine\client\client.h" />
+    <ClInclude Include="..\engine\client\cl_tent.h" />
+    <ClInclude Include="..\engine\client\gl_export.h" />
+    <ClInclude Include="..\engine\client\gl_local.h" />
+    <ClInclude Include="..\engine\client\gl_vidnt.h" />
+    <ClInclude Include="..\engine\client\input.h" />
+    <ClInclude Include="..\engine\client\joyinput.h" />
+    <ClInclude Include="..\engine\client\sound.h" />
+    <ClInclude Include="..\engine\client\touch.h" />
+    <ClInclude Include="..\engine\client\vgui\vgui_api.h" />
+    <ClInclude Include="..\engine\client\vgui\vgui_draw.h" />
+    <ClInclude Include="..\engine\client\vox.h" />
+    <ClInclude Include="..\engine\common\base_cmd.h" />
+    <ClInclude Include="..\engine\common\common.h" />
+    <ClInclude Include="..\engine\common\crtlib.h" />
+    <ClInclude Include="..\engine\common\crtlib_inline.h" />
+    <ClInclude Include="..\engine\common\filesystem.h" />
+    <ClInclude Include="..\engine\common\imagelib\imagelib.h" />
+    <ClInclude Include="..\engine\common\library.h" />
+    <ClInclude Include="..\engine\common\mathlib.h" />
+    <ClInclude Include="..\engine\common\mod_local.h" />
+    <ClInclude Include="..\engine\common\neon_mathfun.h" />
+    <ClInclude Include="..\engine\common\netchan.h" />
+    <ClInclude Include="..\engine\common\net_buffer.h" />
+    <ClInclude Include="..\engine\common\net_encode.h" />
+    <ClInclude Include="..\engine\common\pm_local.h" />
+    <ClInclude Include="..\engine\common\protocol.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\huffman.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\l2tables.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\libmpg.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\mpg123.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\mpglib.h" />
+    <ClInclude Include="..\engine\common\soundlib\libmpg\wavehdr.h" />
+    <ClInclude Include="..\engine\common\soundlib\soundlib.h" />
+    <ClInclude Include="..\engine\common\sse_mathfun.h" />
+    <ClInclude Include="..\engine\common\system.h" />
+    <ClInclude Include="..\engine\common\world.h" />
+    <ClInclude Include="..\engine\custom.h" />
+    <ClInclude Include="..\engine\customentity.h" />
+    <ClInclude Include="..\engine\edict.h" />
+    <ClInclude Include="..\engine\eiface.h" />
+    <ClInclude Include="..\engine\keydefs.h" />
+    <ClInclude Include="..\engine\menu_int.h" />
+    <ClInclude Include="..\engine\mobility_int.h" />
+    <ClInclude Include="..\engine\physint.h" />
+    <ClInclude Include="..\engine\platform\android\android-main.h" />
+    <ClInclude Include="..\engine\platform\android\dlsym-weak.h" />
+    <ClInclude Include="..\engine\platform\android\gl_mangle.h" />
+    <ClInclude Include="..\engine\platform\android\linker.h" />
+    <ClInclude Include="..\engine\platform\sdl\events.h" />
+    <ClInclude Include="..\engine\platform\vita\dll_vita.h" />
+    <ClInclude Include="..\engine\platform\vita\gl_mangle.h" />
+    <ClInclude Include="..\engine\platform\vita\gl_stubs.h" />
+    <ClInclude Include="..\engine\platform\vita\in_vita.h" />
+    <ClInclude Include="..\engine\platform\vita\vid_vita.h" />
+    <ClInclude Include="..\engine\progdefs.h" />
+    <ClInclude Include="..\engine\Sequence.h" />
+    <ClInclude Include="..\engine\server\server.h" />
+    <ClInclude Include="..\engine\shake.h" />
+    <ClInclude Include="..\engine\sprite.h" />
+    <ClInclude Include="..\engine\studio.h" />
+    <ClInclude Include="..\engine\warpsin.h" />
+    <ClInclude Include="..\mainui\basemenu.h" />
+    <ClInclude Include="..\mainui\enginecallback.h" />
+    <ClInclude Include="..\mainui\extdll.h" />
+    <ClInclude Include="..\mainui\menufont.h" />
+    <ClInclude Include="..\mainui\menu_btnsbmp_table.h" />
+    <ClInclude Include="..\mainui\menu_strings.h" />
+    <ClInclude Include="..\mainui\ui_title_anim.h" />
+    <ClInclude Include="..\mainui\utils.h" />
+    <ClInclude Include="..\modselector\charwidths.h" />
+    <ClInclude Include="..\modselector\utils.h" />
+    <ClInclude Include="..\pm_shared\pm_debug.h" />
+    <ClInclude Include="..\pm_shared\pm_defs.h" />
+    <ClInclude Include="..\pm_shared\pm_info.h" />
+    <ClInclude Include="..\pm_shared\pm_materials.h" />
+    <ClInclude Include="..\pm_shared\pm_movevars.h" />
+    <ClInclude Include="..\pm_shared\pm_shared.h" />
+    <ClInclude Include="..\vgui_support\utlmemory.h" />
+    <ClInclude Include="..\vgui_support\utlrbtree.h" />
+    <ClInclude Include="..\vgui_support\utlvector.h" />
+    <ClInclude Include="..\vgui_support\vgui_main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Makefile" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
