@@ -65,19 +65,17 @@
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeBuildCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR"</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>
-    </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>
-    </NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR clean; make -C $VITAXASH3D_DIR"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR clean"</NMakeCleanCommandLine>
+    <IncludePath>$(VITASDK_PATH)\arm-vita-eabi\include;$(VITASDK_PATH)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeBuildCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR"</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>
-    </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>
-    </NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR clean; make -C $VITAXASH3D_DIR"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(MSYS2_DIR)\usr\bin\bash --login -i -c "make -C $VITAXASH3D_DIR clean"</NMakeCleanCommandLine>
+    <IncludePath>$(VITASDK_PATH)\arm-vita-eabi\include;$(VITASDK_PATH)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
