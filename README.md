@@ -7,9 +7,14 @@ This port is still a work in progress. Expect graphics and sound glitches, crash
 ## Requirements
 - Vita SDK Toolchain (use [VDPM](https://github.com/vitasdk/vdpm) for installing)
 - Latest version of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
+- [MSYS2](https://www.msys2.org) (only for building under Windows)
 
-## Building
-Run `make` in this directory. This should produce a VPK.
+## Building on Windows
+For building on Windows, you should to use [MSYS2](https://www.msys2.org).
+Install it, set `MSYS2_DIR` environment variable as path to msys2 directory (for example, C:\msys64)
+Add line `VITAXASH3D_DIR=*your path to cloned repo* # (as example, "C:\vitaXash3D")` to bottom of your `MSYS2_DIR/.bashrc` file.
+Next, build project using Visual Studio, or run MSYS2 shell, set current directory (`cd $VITAXASH3D_DIR`), and then run `make`.
+This should produce a VPK file.
 
 ## Running
 1. Copy the desired game directory (e.g. `valve` for Half-Life) to `ux0:/data/xash3d/`.

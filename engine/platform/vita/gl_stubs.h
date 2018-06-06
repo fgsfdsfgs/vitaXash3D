@@ -181,8 +181,6 @@ static inline void glShadeModel( GLenum model ) { }
 static inline void glTexGeni( GLenum coord, GLenum pname, GLint param ) { }
 static inline void glPixelStorei( GLenum opt, GLint val ) { }
 static inline GLboolean glIsTexture( GLenum obj ) { return obj >= 0 && obj < 2000; }
-static inline void glPointSize( GLfloat size ) { }
-static inline void glLineWidth( GLfloat w ) { }
 static inline void glNormal3fv( GLfloat *v ) { }
 
 static inline void glTexParameterfv( GLenum targ, GLenum opt, GLfloat *params ) { glTexParameterf( targ, opt, params[0] ); }
