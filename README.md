@@ -11,9 +11,11 @@ This port is still a work in progress. Expect graphics and sound glitches, crash
 
 ## Building on Windows
 For building on Windows, you should to use [MSYS2](https://www.msys2.org).
-Install it, set `MSYS2_DIR` environment variable as path to msys2 directory (for example, C:\msys64)
-Add line `VITAXASH3D_DIR=*your path to cloned repo* # (as example, "C:\vitaXash3D")` to bottom of your `MSYS2_DIR/.bashrc` file.
-Next, build project using Visual Studio, or run MSYS2 shell, set current directory (`cd $VITAXASH3D_DIR`), and then run `make`.
+- Install it, set `MSYS2_DIR` environment variable in Windows as path to msys2 directory (for example, C:\msys64).
+- Add line `VITAXASH3D_DIR=*your path to cloned repo* # (as example, "C:\vitaXash3D")` to bottom of your `%MSYS2_DIR%/.bashrc` file.
+- Using MSYS2 shell, do clone [vitaGL](https://github.com/Rinnegatamante/vitaGL) repo and set current directory to it, after run `make`.
+- Place resulting `libvitaGL.a` file to `%VITASDK%/arm-vita-eabi/lib`. Also, place vitaGL header to `%VITASDK/arm-vita-eabi/include%`.
+- After, build project using Visual Studio, or run MSYS2 shell, set current directory (`cd $VITAXASH3D_DIR`), and then run `make`.
 This should produce a VPK file.
 
 ## Running
