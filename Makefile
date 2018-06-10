@@ -35,6 +35,8 @@ CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=c++11 -fpermissive
 
 all: launcher.bin $(APPNAME).vpk
 
+rebuild: clean launcher.bin $(APPNAME).vpk
+
 launcher.bin:
 	$(MAKE) -C modselector
 

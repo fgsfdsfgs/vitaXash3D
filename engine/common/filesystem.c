@@ -37,6 +37,7 @@ GNU General Public License for more details.
 #include <unistd.h>
 #ifdef __vita__
 #include <psp2/io/stat.h>
+#include <psp2/io/fcntl.h>
 #define mkdir( path, mode ) sceIoMkdir( (path), (mode) )
 #define rmdir( path ) sceIoRmdir( (path) )
 #endif
@@ -67,7 +68,7 @@ typedef struct wadtype_s
 
 struct file_s
 {
-	int		handle;			// file descriptor
+	FILE *		handle;			// file descriptor
 	fs_offset_t	real_length;		// uncompressed file size (for files opened in "read" mode)
 	fs_offset_t	position;			// current position in the file
 	fs_offset_t	offset;			// offset into the package (0 if external file)
@@ -615,7 +616,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 {
 	dpackheader_t	header;
 	int		i, numpackfiles;
-	int		packhandle;
+	FILE *		packhandle;
 	pack_t		*pack;
 	dpackfile_t	*info;
 
@@ -626,13 +627,13 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	else
 		Q_snprintf( realpath, MAX_SYSPATH, "%s", packfile );
 
-	packhandle = open( realpath, O_RDONLY|O_BINARY );
+	packhandle = fopen( realpath, "rb" );
 
 	if( packhandle < 0 )
 	{
 		const char *fpackfile = FS_FixFileCase( realpath );
 		if( fpackfile!= realpath )
-			packhandle = open( fpackfile, O_RDONLY|O_BINARY );
+			packhandle = fopen( fpackfile, "rb" );
 	}
 #else
 	packhandle = open( packfile, O_RDONLY|O_BINARY );
@@ -661,7 +662,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s is not a packfile. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_HEADER;
-		close( packhandle );
+		fclose( packhandle );
 		return NULL;
 	}
 
@@ -669,7 +670,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has an invalid directory size. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_FOLDERS;
-		close( packhandle );
+		fclose( packhandle );
 		return NULL;
 	}
 
@@ -679,7 +680,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has too many files ( %i ). Ignored.\n", packfile, numpackfiles );
 		if( error ) *error = PAK_LOAD_TOO_MANY_FILES;
-		close( packhandle );
+		fclose( packhandle );
 		return NULL;
 	}
 
@@ -687,18 +688,18 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s has no files. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_NO_FILES;
-		close( packhandle );
+		fclose( packhandle );
 		return NULL;
 	}
 
 	info = (dpackfile_t *)Mem_Alloc( fs_mempool, sizeof( *info ) * numpackfiles );
-	lseek( packhandle, header.dirofs, SEEK_SET );
+	fseek( packhandle, header.dirofs, SEEK_SET );
 
 	if( header.dirlen != read( packhandle, (void *)info, header.dirlen ))
 	{
 		MsgDev( D_NOTE, "%s is an incomplete PAK, not loading\n", packfile );
 		if( error ) *error = PAK_LOAD_CORRUPTED;
-		close( packhandle );
+		fclose( packhandle );
 		Mem_Free( info );
 		return NULL;
 	}
@@ -2065,9 +2066,9 @@ Internal function used to create a file_t and open the relevant non-packed file 
 static file_t* FS_SysOpen( const char* filepath, const char* mode )
 {
 	file_t	*file;
-	int	mod, opt;
 	uint	ind;
 
+	int	mod, opt;
 	// Parse the mode string
 	switch( mode[0] )
 	{
@@ -2117,7 +2118,11 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	file->filetime = FS_SysFileTime( filepath );
 	file->ungetc = EOF;
 
-	file->handle = open( filepath, mod|opt, 0666 );
+	#ifdef __vita__
+	file->handle = fopen(filepath, mode);
+	#else
+	file->handle = open(filepath, mod | opt, 0666);
+	#endif
 
 #ifndef _WIN32
 	if( file->handle < 0 )
@@ -2133,8 +2138,12 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 		Mem_Free( file );
 		return NULL;
 	}
-
+	
+	#ifdef __vita__
+	file->real_length = fseek(file->handle, 0, SEEK_END);
+	#else
 	file->real_length = lseek( file->handle, 0, SEEK_END );
+	#endif
 	if( file->real_length == -1 )
 	{
 		MsgDev( D_ERROR, "FS_SysOpen: Cannot lseek file: %s\n", strerror(errno));
@@ -2143,7 +2152,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 
 	// For files opened in append mode, we start at the end of the file
 	if( mod & O_APPEND ) file->position = file->real_length;
-	else lseek( file->handle, 0, SEEK_SET );
+	else fseek( file->handle, 0, SEEK_SET );
 
 	return file;
 }
@@ -2164,7 +2173,7 @@ file_t *FS_OpenPackedFile( pack_t *pack, int pack_ind )
 
 	pfile = &pack->files[pack_ind];
 
-	if( lseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
+	if( fseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
 		return NULL;
 
 	dup_handle = dup( pack->handle );
@@ -2192,17 +2201,27 @@ Look for a file in the filesystem only
 */
 qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 {
+	#ifdef __vita__
+	FILE * desc;
+	#else
 	int desc;
-#ifdef __vita__
+	#endif
+
+	#ifdef __vita__
 	char realpath[MAX_SYSPATH];
 	if( Q_strncmp( path, "ux0:", 4 ) )
 	{
 		Q_snprintf( realpath, MAX_SYSPATH, CWD "/%s", path );
 		path = realpath;
 	}
-#endif
+	#endif
+
+	#ifdef __vita__
+	desc = fopen(path, "rb");
+	#else
 	desc = open( path, O_RDONLY|O_BINARY );
-#ifndef _WIN32
+	#endif
+	#ifndef _WIN32
 	// speedup custom path search
 	if( caseinsensitive && ( desc < 0 ) )
 	{
@@ -2210,9 +2229,13 @@ qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 		if( fpath != path )
 			desc = open( fpath, O_RDONLY|O_BINARY );
 	}
-#endif
+	#endif
 	if( desc < 0 ) return false;
-	close( desc );
+		#ifdef __vita__	
+		fclose( desc );
+		#else
+		close(desc);
+		#endif
 	return true;
 }
 
@@ -2495,8 +2518,13 @@ Close a file
 */
 int FS_Close( file_t *file )
 {
+	#ifdef __vita__
+	if (fclose(file->handle))
+		return EOF;
+	#else
 	if( close( file->handle ))
 		return EOF;
+	#endif
 
 	Mem_Free( file );
 	return 0;
@@ -2517,14 +2545,19 @@ fs_offset_t FS_Write( file_t *file, const void *data, size_t datasize )
 
 	// if necessary, seek to the exact file position we're supposed to be
 	if( file->buff_ind != file->buff_len )
-		lseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
+		fseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
 
 	// purge cached data
 	FS_Purge( file );
 
 	// write the buffer and update the position
-	result = write( file->handle, data, (fs_offset_t)datasize );
-	file->position = lseek( file->handle, 0, SEEK_CUR );
+	#ifdef __vita__
+	result = fwrite(data, sizeof(char), (fs_offset_t)datasize, file->handle);
+	#else
+	result = write(file->handle, data, (fs_offset_t)datasize);
+	#endif
+
+	file->position = fseek( file->handle, 0, SEEK_CUR );
 	if( file->real_length < file->position )
 		file->real_length = file->position;
 
@@ -2582,8 +2615,12 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 	{
 		if( count > (fs_offset_t)buffersize )
 			count = (fs_offset_t)buffersize;
-		lseek( file->handle, file->offset + file->position, SEEK_SET );
+		fseek( file->handle, file->offset + file->position, SEEK_SET );
+		#ifdef __vita__
+		nb = fread(&((byte *)buffer)[done], sizeof(char), count, file->handle);
+		#else
 		nb = read (file->handle, &((byte *)buffer)[done], count );
+		#endif
 
 		if( nb > 0 )
 		{
@@ -2597,9 +2634,12 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 	{
 		if( count > (fs_offset_t)sizeof( file->buff ))
 			count = (fs_offset_t)sizeof( file->buff );
-		lseek( file->handle, file->offset + file->position, SEEK_SET );
+		fseek( file->handle, file->offset + file->position, SEEK_SET );
+		#ifdef __vita__
+		nb = fread(file->buff, sizeof(char), count, file->handle);
+		#else
 		nb = read( file->handle, file->buff, count );
-
+		#endif
 		if( nb > 0 )
 		{
 			file->buff_len = nb;
@@ -2671,7 +2711,7 @@ int FS_VPrintf( file_t *file, const char* format, va_list ap )
 		buff_size *= 2;
 	}
 
-	len = write( file->handle, tempbuff, len );
+	len = fwrite(tempbuff, sizeof(char), len, file->handle);
 	Mem_Free( tempbuff );
 
 	return len;
@@ -2748,7 +2788,7 @@ int FS_Seek( file_t *file, fs_offset_t offset, int whence )
 	// Purge cached data
 	FS_Purge( file );
 
-	if( lseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
+	if( fseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
 		return -1;
 	file->position = offset;
 
@@ -3729,7 +3769,7 @@ byte *W_ReadLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
 	// no wads loaded
 	if( !wad || !lump ) return NULL;
 
-	if( lseek( wad->handle, lump->filepos, SEEK_SET ) == -1 )
+	if( fseek( wad->handle, lump->filepos, SEEK_SET ) == -1 )
 	{
 		MsgDev( D_ERROR, "W_ReadLump: %s is corrupted\n", lump->name );
 		return NULL;
@@ -3768,18 +3808,14 @@ wfile_t *W_Open( const char *filename, const char *mode )
 	else
 		Q_snprintf( realpath, MAX_SYSPATH, "%s", filename );
 
-	if( mode[0] == 'a' ) wad->handle = open( realpath, O_RDWR|O_BINARY, 0x666 );
-	else if( mode[0] == 'w' ) wad->handle = open( realpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0x666 );
-	else if( mode[0] == 'r' ) wad->handle = open( realpath, O_RDONLY|O_BINARY, 0x666 );
+	wad->handle = fopen( realpath, mode );
 
 	if( wad->handle < 0 )
 	{
 		const char *ffilename = FS_FixFileCase( realpath );
 		if( ffilename != realpath )
 		{
-			if( mode[0] == 'a' ) wad->handle = open( ffilename, O_RDWR|O_BINARY, 0x666 );
-			else if( mode[0] == 'w' ) wad->handle = open( ffilename, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0x666 );
-			else if( mode[0] == 'r' ) wad->handle = open( ffilename, O_RDONLY|O_BINARY, 0x666 );
+			wad->handle = fopen( ffilename, mode );
 		}
 	}
 
@@ -3828,19 +3864,20 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		hdr.ident = IDWAD3HEADER;
 		hdr.numlumps = wad->numlumps;
 		hdr.infotableofs = sizeof( dwadinfo_t );
-		write( wad->handle, &hdr, sizeof( hdr ));
-		write( wad->handle, comment, Q_strlen( comment ) + 1 );
+		fwrite( &hdr, sizeof(char), sizeof( hdr ), wad->handle);
+		fwrite(comment, sizeof(char), Q_strlen( comment ) + 1, wad->handle);
 		wad->infotableofs = tell( wad->handle );
 	}
 	else if( mode[0] == 'r' || mode[0] == 'a' )
 	{
 		if( mode[0] == 'a' )
 		{
-			lseek( wad->handle, 0, SEEK_SET );
+			fseek( wad->handle, 0, SEEK_SET );
 			wad->mode = O_APPEND;
 		}
 
-		if( read( wad->handle, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
+		//if(read( wad->handle, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
+		if (fread(&header, sizeof(char), sizeof(dwadinfo_t), wad->handle) != sizeof(dwadinfo_t))
 		{
 			MsgDev( D_ERROR, "W_Open: %s can't read header\n", filename );
 			W_Close( wad );
@@ -3865,7 +3902,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 			wad->mode = O_RDONLY; // set read-only mode
 		}
 		wad->infotableofs = header.infotableofs; // save infotableofs position
-		if( lseek( wad->handle, wad->infotableofs, SEEK_SET ) == -1 )
+		if( fseek( wad->handle, wad->infotableofs, SEEK_SET ) == -1 )
 		{
 			MsgDev( D_ERROR, "W_Open: %s can't find lump allocation table\n", filename );
 			W_Close( wad );
@@ -3888,7 +3925,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 
 			// if we are in append mode - we need started from infotableofs poisition
 			// overwrite lumptable as well, we have her copy in wad->lumps
-			lseek( wad->handle, wad->infotableofs, SEEK_SET );
+			fseek( wad->handle, wad->infotableofs, SEEK_SET );
 		}
 		else
 		{
@@ -3918,20 +3955,20 @@ void W_Close( wfile_t *wad )
 		dwadinfo_t	hdr;
 
 		// write the lumpinfo
-		ofs = tell( wad->handle );
-		write( wad->handle, wad->lumps, wad->numlumps * sizeof( dlumpinfo_t ));
-		
+		ofs = tell(wad->handle);
+		fwrite(wad->lumps, sizeof(char), wad->numlumps * sizeof(dlumpinfo_t), wad->handle);
+
 		// write the header
 		hdr.ident = IDWAD3HEADER;
 		hdr.numlumps = wad->numlumps;
 		hdr.infotableofs = ofs;
 
-		lseek( wad->handle, 0, SEEK_SET );
-		write( wad->handle, &hdr, sizeof( hdr ));
+		fseek(wad->handle, 0, SEEK_SET);
+		fwrite(&hdr, sizeof(char), sizeof(hdr), wad->handle);
 	}
 
 	Mem_FreePool( &wad->mempool );
-	if( wad->handle >= 0 ) close( wad->handle );	
+	if( wad->handle >= 0 ) fclose( wad->handle );	
 	Mem_Free( wad ); // free himself
 }
 

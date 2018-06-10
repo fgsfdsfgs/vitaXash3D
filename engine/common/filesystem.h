@@ -98,7 +98,7 @@ struct wfile_s
 	byte		*mempool;	// W_ReadLump temp buffers
 	int		numlumps;
 	int		mode;
-	int		handle;
+	FILE    *handle;
 	dlumpinfo_t	*lumps;
 	time_t		filetime;
 };
@@ -113,8 +113,8 @@ typedef struct packfile_s
 typedef struct pack_s
 {
 	char		filename[MAX_SYSPATH];
-	int		handle;
-	int		numfiles;
+	FILE        *handle;
+	int		    numfiles;
 	time_t		filetime;	// common for all packed files
 	packfile_t	*files;
 } pack_t;
