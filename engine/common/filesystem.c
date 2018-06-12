@@ -97,7 +97,7 @@ static packfile_t* FS_AddFileToPack( const char* name, pack_t *pack, fs_offset_t
 static byte *W_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
 static qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive );
 static qboolean FS_SysFolderExists( const char *path );
-static int FS_SysFileTime( const char *filename );
+static int FS_SysFileTime( FILE *fileptr );
 static signed char W_TypeFromExt( const char *lumpname );
 static const char *W_ExtFromType( signed char lumptype );
 
@@ -656,7 +656,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 		return NULL;
 	}
 
-	read( packhandle, (void *)&header, sizeof( header ));
+	fread((void *)&header, sizeof(char), sizeof(header), packhandle);
 
 	if( header.ident != IDPACKV1HEADER )
 	{
@@ -709,7 +709,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	pack->handle = packhandle;
 	pack->numfiles = 0;
 	pack->files = (packfile_t *)Mem_Alloc( fs_mempool, numpackfiles * sizeof( packfile_t ));
-	pack->filetime = FS_SysFileTime( packfile );
+	pack->filetime = FS_SysFileTime( pack->handle );
 
 	// parse the directory
 	for( i = 0; i < numpackfiles; i++ )
@@ -2015,19 +2015,12 @@ FS_SysFileTime
 Internal function used to determine filetime
 ====================
 */
-static int FS_SysFileTime( const char *filename )
+static int FS_SysFileTime( FILE *fileptr )
 {
+	// fstat may cause crashes on vita, need to be tested
 	struct stat buf;
 	
-#ifdef __vita__
-	char realpath[MAX_SYSPATH];
-	if( Q_strncmp( filename, "ux0:", 4 ) )
-	{
-		Q_snprintf( realpath, MAX_SYSPATH, CWD "/%s", filename );
-		filename = realpath;
-	}
-#endif
-	if( stat( filename, &buf ) == -1 )
+	if(fstat(fileno(fileptr), &buf) == -1)
 		return -1;
 
 	return buf.st_mtime;
@@ -2114,8 +2107,8 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 #endif
 
-	file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
-	file->filetime = FS_SysFileTime( filepath );
+	//file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
+	file->filetime = FS_SysFileTime( file->handle );
 	file->ungetc = EOF;
 
 	#ifdef __vita__
@@ -2133,9 +2126,9 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 #endif
 
-	if( file->handle < 0 )
+	if(!file->handle)
 	{
-		Mem_Free( file );
+		//Mem_Free( file );
 		return NULL;
 	}
 	
@@ -3178,7 +3171,10 @@ fs_offset_t FS_FileTime( const char *filename, qboolean gamedironly )
 		// found in the filesystem?
 		char	path [MAX_SYSPATH];
 		Q_sprintf( path, "%s%s", search->filename, filename );
-		return FS_SysFileTime( path );
+		FILE *temp = fopen(path, "r");
+		int filetime = FS_SysFileTime(temp);
+		fclose(temp);
+		return filetime;
 	}
 	return -1; // doesn't exist
 }
@@ -3866,7 +3862,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		hdr.infotableofs = sizeof( dwadinfo_t );
 		fwrite( &hdr, sizeof(char), sizeof( hdr ), wad->handle);
 		fwrite(comment, sizeof(char), Q_strlen( comment ) + 1, wad->handle);
-		wad->infotableofs = tell( wad->handle );
+		wad->infotableofs = ftell( wad->handle );
 	}
 	else if( mode[0] == 'r' || mode[0] == 'a' )
 	{
@@ -3955,7 +3951,7 @@ void W_Close( wfile_t *wad )
 		dwadinfo_t	hdr;
 
 		// write the lumpinfo
-		ofs = tell(wad->handle);
+		ofs = ftell(wad->handle);
 		fwrite(wad->lumps, sizeof(char), wad->numlumps * sizeof(dlumpinfo_t), wad->handle);
 
 		// write the header
