@@ -5,7 +5,8 @@ LIBS = -lvitaGL \
        -lSceLibKernel_stub -lSceAppMgr_stub -lSceSysmodule_stub \
        -lSceCtrl_stub -lSceTouch_stub -lm -lSceNet_stub -lSceNetCtl_stub \
        -lSceAppUtil_stub -lc -lScePower_stub -lSceCommonDialog_stub \
-       -lSceAudio_stub -lSceGxm_stub -lSceDisplay_stub -lSceNet_stub -lSceNetCtl_stub
+       -lSceAudio_stub -lSceGxm_stub -lSceDisplay_stub -lSceNet_stub \
+	   -lSceNetCtl_stub -lSceIofilemgr_stub
 
 INCLUDES = -Iengine -Iengine/common -Icommon \
            -Iengine/server -Iengine/client \
