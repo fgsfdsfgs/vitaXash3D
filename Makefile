@@ -73,8 +73,8 @@ $(APPNAME).vpk: xash.velf launcher.bin
 		$(APPNAME).vpk
 
 %.velf: %.elf
-	cp $< $<.unstripped.elf
-	$(PREFIX)-strip -g $<
+	#cp $< $<.unstripped.elf
+	#$(PREFIX)-strip -g $<
 	vita-elf-create $< $@
 
 xash.elf: $(OBJS)

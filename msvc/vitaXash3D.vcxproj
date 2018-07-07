@@ -102,7 +102,7 @@
     <ReferencePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <NMakePreprocessorDefinitions>__vita__</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__vita__;</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeBuildCommandLine />
     <NMakeReBuildCommandLine />
@@ -112,6 +112,7 @@
     <SourcePath />
     <LibraryPath />
     <ReferencePath />
+    <ExecutablePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakePreprocessorDefinitions>WIN32;__vita__</NMakePreprocessorDefinitions>
@@ -129,7 +130,7 @@
     <LibraryPath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <NMakePreprocessorDefinitions>__vita__</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__vita__;</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\engine;..\common;..\engine\common;..\engine\server;..\engine\client;..\engine\client\vgui;..\pm_shared;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeBuildCommandLine />
     <NMakeReBuildCommandLine />
@@ -139,6 +140,7 @@
     <SourcePath />
     <ReferencePath />
     <LibraryPath />
+    <ExecutablePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryWPath />
