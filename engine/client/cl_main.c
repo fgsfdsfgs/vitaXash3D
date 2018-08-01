@@ -1163,6 +1163,7 @@ void CL_InternetServers_f( void )
 
 	Info_SetValueForKey( info, "nat", cl_nat->string, 256 );
 	Info_SetValueForKey( info, "gamedir", GI->gamedir, 256 );
+	Info_SetValueForKey( info, "clver", XASH_VERSION, 256 );
 
 	MsgDev( D_INFO, "Scanning for servers on the internet area...\n" );
 	NET_Config( true ); // allow remote
