@@ -5,11 +5,16 @@ A port of Xash3D-FWGS to the PSVita.
 This port is still a work in progress. Expect graphics and sound glitches, crashes and gameplay oddities.
 
 ## Requirements
-- VitaSDK (in PATH and with VITASDK set);
+- Vita SDK Toolchain (use [VDPM](https://github.com/vitasdk/vdpm) for installation)
 - Latest version of [vitaGL](https://github.com/Rinnegatamante/vitaGL).
+- [MSYS2](https://www.msys2.org) (for building under Windows)
 
-## Building
-Run `make` in this directory. This should produce a VPK.
+## Building on Windows
+For building on Windows, you should to use [MSYS2](https://www.msys2.org).
+- Using MSYS2 shell, do clone [vitaGL](https://github.com/Rinnegatamante/vitaGL) repo and set current directory to it, after run `make`.
+- Place resulting `libvitaGL.a` file to `%VITASDK%/arm-vita-eabi/lib`. Also, place vitaGL header to `%VITASDK%/arm-vita-eabi/include`.
+- After, run MSYS2 shell, set current directory to this repo root, and then run `make`.
+This should produce a VPK file.
 
 ## Running
 1. Copy the desired game directory (e.g. `valve` for Half-Life) to `ux0:/data/xash3d/`.
