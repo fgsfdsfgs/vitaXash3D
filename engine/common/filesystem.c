@@ -89,7 +89,7 @@ char		fs_gamedir[MAX_SYSPATH];	// game current directory
 char		gs_basedir[MAX_SYSPATH];	// initial dir before loading gameinfo.txt (used for compilers too)
 qboolean		fs_ext_path = false;	// attempt to read\write from ./ or ../ paths 
 #ifndef _WIN32
-qboolean		fs_caseinsensitive = true; // try to search missing files
+qboolean		fs_caseinsensitive = true; // try to search files
 #endif
 static void FS_InitMemory( void );
 static dlumpinfo_t *W_FindLump( wfile_t *wad, const char *name, const signed char matchtype );
@@ -2142,8 +2142,10 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 
 	// For files opened in append mode, we start at the end of the file
-	if( mod & O_APPEND ) file->position = file->real_length;
-	else sceIoLseek(file->handle, 0, SCE_SEEK_SET);
+	if (opt & SCE_O_APPEND) 
+		file->position = file->real_length;
+	else 
+		sceIoLseek(file->handle, 0, SCE_SEEK_SET);
 
 	return file;
 }
@@ -2460,6 +2462,7 @@ file_t *FS_Open( const char *filepath, const char *mode, qboolean gamedironly )
 {
 	if( !filepath )
 		return NULL;
+
 	if( host.type != HOST_UNKNOWN )
 	{
 		// some stupid mappers used leading '/' or '\' in path to models or sounds
@@ -2546,7 +2549,10 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 	fs_offset_t	nb;
 
 	// nothing to copy
-	if( buffersize == 0 ) return 1;
+	if (buffersize == 0) {
+		MsgDev(D_WARN, "FS_Read: occured zero buffer size!\n");
+		return 1;
+	}
 
 	// Get rid of the ungetc character
 	if( file->ungetc != EOF )
@@ -3875,7 +3881,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		// NOTE: lumps table can be reallocated for O_APPEND mode
 		wad->lumps = Mem_Alloc( wad->mempool, wad->numlumps * sizeof( dlumpinfo_t ));
 
-		if( wad->mode == O_APPEND )
+		if( wad->mode == SCE_O_APPEND )
 		{ 
 			size_t	lat_size = wad->numlumps * sizeof( dlumpinfo_t );
 
@@ -3913,7 +3919,7 @@ void W_Close( wfile_t *wad )
 
 	if( !wad ) return;
 
-	if( wad->handle >= 0 && ( wad->mode == O_APPEND || wad->mode == O_WRONLY ))
+	if( wad->handle >= 0 && ( wad->mode == SCE_O_APPEND || wad->mode == SCE_O_WRONLY ))
 	{
 		dwadinfo_t	hdr;
 
