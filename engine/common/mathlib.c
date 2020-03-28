@@ -230,7 +230,7 @@ float VectorNormalizeLength2( const vec3_t v, vec3_t out )
 	float	length, ilength;
 
 	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt( length );
+	length = sqrtf( length );
 
 	if( length )
 	{
@@ -328,7 +328,7 @@ void VectorAngles( const float *forward, float *angles )
 		yaw = ( atan2( forward[1], forward[0] ) * 180 / M_PI );
 		if( yaw < 0 ) yaw += 360;
 
-		tmp = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
+		tmp = sqrtf( forward[0] * forward[0] + forward[1] * forward[1] );
 		pitch = ( atan2( forward[2], tmp ) * 180 / M_PI );
 		if( pitch < 0 ) pitch += 360;
 	}

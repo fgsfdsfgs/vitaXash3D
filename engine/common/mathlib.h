@@ -17,6 +17,10 @@ GNU General Public License for more details.
 #define MATHLIB_H
 
 #include <math.h>
+#ifdef __vita__
+#include <math_neon.h>
+#endif
+
 
 #pragma warning(disable : 4201)	// nonstandard extension used
 

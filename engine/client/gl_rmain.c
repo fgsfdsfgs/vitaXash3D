@@ -1050,6 +1050,7 @@ static void R_CheckFog( void )
 		RI.fogColor[0] = tex->fogParams[0] / 255.0f;
 		RI.fogColor[1] = tex->fogParams[1] / 255.0f;
 		RI.fogColor[2] = tex->fogParams[2] / 255.0f;
+		RI.fogColor[3] = 1.0f;
 		RI.fogDensity = tex->fogParams[3] * 0.000025f;
 		RI.fogStart = RI.fogEnd = 0.0f;
 		RI.fogCustom = false;

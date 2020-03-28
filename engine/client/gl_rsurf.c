@@ -223,7 +223,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 
 void GL_SetupFogColorForSurfaces( void )
 {
-	vec3_t	fogColor;
+	float	fogColor[4];
 	float	factor, div;
 
 	Q_memset(fogColor, 0, 3 * sizeof(float)); //Result pow( RI.fogColor[i] / div, ( 1.0f / factor )) may be nan.
@@ -232,7 +232,7 @@ void GL_SetupFogColorForSurfaces( void )
 		return;
 
 	if( RI.currententity->curstate.rendermode == kRenderTransTexture )
-          {
+	{
 		pglFogfv( GL_FOG_COLOR, RI.fogColor );
 		return;
 	}
@@ -242,6 +242,7 @@ void GL_SetupFogColorForSurfaces( void )
 	fogColor[0] = pow( RI.fogColor[0] / div, ( 1.0f / factor ));
 	fogColor[1] = pow( RI.fogColor[1] / div, ( 1.0f / factor ));
 	fogColor[2] = pow( RI.fogColor[2] / div, ( 1.0f / factor ));
+	fogColor[3] = 1.0f;
 	pglFogfv( GL_FOG_COLOR, fogColor );
 }
 

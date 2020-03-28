@@ -103,7 +103,7 @@ void init_layer3(struct StaticData * psd, int down_sample_sblimit)
   for (i=0;i<8;i++)
   {
     const double Ci[8]={-0.6,-0.535,-0.33,-0.185,-0.095,-0.041,-0.0142,-0.0037};
-    double sq=sqrt(1.0+Ci[i]*Ci[i]);
+    double sq=sqrtf(1.0+Ci[i]*Ci[i]);
     psd->aa_cs[i] = 1.0/sq;
     psd->aa_ca[i] = Ci[i]/sq;
   }

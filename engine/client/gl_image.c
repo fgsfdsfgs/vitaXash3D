@@ -3936,7 +3936,7 @@ static rgbdata_t *R_InitParticleTexture( texFlags_t *flags )
 		for( y = 0; y < 16; y++ )
 		{
 			dy = y - 8;
-			d = 255 - 35 * sqrt( dx2 + dy * dy );
+			d = 255 - 35 * sqrtf( dx2 + dy * dy );
 			data2D[( y*16 + x ) * 4 + 3] = bound( 0, d, 255 );
 		}
 	}
@@ -4258,7 +4258,7 @@ static rgbdata_t *R_InitAttenTexture3D( texFlags_t *flags )
 				v[1] = (( y + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
 				if( r_image.depth > 1 ) v[2] = (( z + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
 
-				intensity = 1.0f - sqrt( DotProduct( v, v ) );
+				intensity = 1.0f - sqrtf( DotProduct( v, v ) );
 				if( intensity > 0 ) intensity = intensity * intensity * 215.5f;
 				d = bound( 0, intensity, 255 );
 
@@ -4390,7 +4390,7 @@ static rgbdata_t *R_InitDlightCubemap( texFlags_t *flags )
 			for( y = 0; y < size; y++ )
 			{
 				dy = y - size / 2;
-				d = 255 - 35 * sqrt( dx2 + dy * dy );
+				d = 255 - 35 * sqrtf( dx2 + dy * dy );
 				dataCM[( y * size + x ) * 4 + 0] = bound( 0, d, 255 );
 				dataCM[( y * size + x ) * 4 + 1] = bound( 0, d, 255 );
 				dataCM[( y * size + x ) * 4 + 2] = bound( 0, d, 255 );

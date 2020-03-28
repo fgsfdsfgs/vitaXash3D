@@ -354,7 +354,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	psprite->type = SPR_FWD_PARALLEL_ORIENTED;
 	psprite->texFormat = SPR_ALPHTEST;
 	psprite->numframes = mod->numframes = numframes;
-	psprite->radius = sqrt((( w >> 1) * (w >> 1)) + ((h >> 1) * (h >> 1)));
+	psprite->radius = sqrtf((( w >> 1) * (w >> 1)) + ((h >> 1) * (h >> 1)));
 
 	mod->mins[0] = mod->mins[1] = -w / 2;
 	mod->maxs[0] = mod->maxs[1] = w / 2;

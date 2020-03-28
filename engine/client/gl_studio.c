@@ -1536,7 +1536,7 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 			dist = DotProduct( vec, vec );
 			atten = (dist / radius2 - 1) * -1;
 			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+			dist = sqrtf( dist );
 
 			if( dist )
 			{
@@ -1622,7 +1622,7 @@ void GAME_EXPORT R_StudioEntityLight( alight_t *lightinfo )
 			dist = DotProduct( vec, vec );
 			atten = (dist / radius2 - 1) * -1;
 			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+			dist = sqrtf( dist );
 
 			if( dist )
 			{

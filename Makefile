@@ -2,9 +2,9 @@ APPNAME := vitaXash3D
 TITLE := XASH00001
 
 LIBS = -lvitaGL \
-       -lSceLibKernel_stub -lSceAppMgr_stub -lSceSysmodule_stub \
-       -lSceCtrl_stub -lSceTouch_stub -lm -lSceNet_stub -lSceNetCtl_stub \
-       -lSceAppUtil_stub -lc -lScePower_stub -lSceCommonDialog_stub \
+       -lSceLibKernel_stub -lScePvf_stub -lmathneon -lSceAppMgr_stub \
+       -lSceSysmodule_stub -lSceCtrl_stub -lSceTouch_stub -lm -lSceNet_stub \
+       -lSceNetCtl_stub -lSceAppUtil_stub -lc -lScePower_stub -lSceCommonDialog_stub \
        -lSceAudio_stub -lSceGxm_stub -lSceDisplay_stub -lSceNet_stub -lSceNetCtl_stub
 
 INCLUDES = -Iengine -Iengine/common -Icommon \
@@ -26,7 +26,7 @@ OBJS     := $(addsuffix .o,$(BINFILES)) $(CFILES:.c=.o)
 PREFIX    = arm-vita-eabi
 CC        = $(PREFIX)-gcc
 CXX       = $(PREFIX)-g++
-CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -Wl,-q -Wfatal-errors -fsigned-char -flto -fno-short-enums \
+CFLAGS    = -g -mtune=cortex-a9 -mfpu=neon -Ofast -ftree-vectorize -Wl,-q -Wfatal-errors -fsigned-char -flto -fno-short-enums \
             $(INCLUDES) \
             -DXASH_STATIC -DXASH_SINGLE_BINARY \
             -DXASH_BUILD_COMMIT="\"$(shell git rev-parse --short HEAD 2> /dev/null || echo notset)\""

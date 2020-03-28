@@ -405,10 +405,10 @@ qboolean R_Init_OpenGL( void )
 
 	qboolean ret = VID_SetMode();
 
-	vglInitExtended( 0x800000, glState.width, glState.height, 0x1000000 );
+	vglInitExtended( 0x800000, glState.width, glState.height, 0x1000000, SCE_GXM_MULTISAMPLE_NONE );
 	vglUseVram( GL_TRUE );
 	vglWaitVblankStart( GL_TRUE );
-	vglMapHeapMem( );
+	vglUseExtraMem( GL_FALSE );
 
 	vglIndexPointerMapped( gl_vgl_indices );
 

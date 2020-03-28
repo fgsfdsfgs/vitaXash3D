@@ -1585,7 +1585,7 @@ void SV_Physics_Step( edict_t *ent )
 			float	control, speed, newspeed;
 			float	friction;
 
-			speed = sqrt(( vel[0] * vel[0] ) + ( vel[1] * vel[1] ));	// DotProduct2D
+			speed = sqrtf(( vel[0] * vel[0] ) + ( vel[1] * vel[1] ));	// DotProduct2D
 
 			if( speed )
 			{

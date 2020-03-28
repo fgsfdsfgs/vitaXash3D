@@ -137,7 +137,7 @@ typedef struct
 
 	qboolean		fogCustom;
 	qboolean		fogEnabled;
-	vec3_t		fogColor;
+	float		fogColor[4];
 	float		fogDensity;
 	float		fogStart;
 	float		fogEnd;

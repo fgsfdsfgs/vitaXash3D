@@ -219,7 +219,7 @@ void Matrix4x4_CreateRotate( matrix4x4 out, float angle, float x, float y, float
 	float	len, c, s;
 
 	len = x * x + y * y + z * z;
-	if( len != 0.0f ) len = 1.0f / sqrt( len );
+	if( len != 0.0f ) len = 1.0f / sqrtf( len );
 	x *= len;
 	y *= len;
 	z *= len;
