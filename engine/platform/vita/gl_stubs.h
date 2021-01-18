@@ -172,7 +172,6 @@ keep an eye on this in case these get implemented in vitaGL for real
 #define GL_PREVIOUS_ARB                    0x8578
 #define GL_TEXTURE                         0x1702
 
-static inline void glHint( GLenum hint, GLenum val ) { }
 static inline void glShadeModel( GLenum model ) { }
 static inline void glTexGeni( GLenum coord, GLenum pname, GLint param ) { }
 static inline void glPixelStorei( GLenum opt, GLint val ) { }

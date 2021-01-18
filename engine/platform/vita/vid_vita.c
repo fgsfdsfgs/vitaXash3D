@@ -25,6 +25,7 @@ float *gl_vgl_verts = NULL;
 float *gl_vgl_texcoords = NULL;
 float *gl_vgl_colors = NULL;
 uint16_t *gl_vgl_indices = NULL;
+vgl_prog_t *gl_vgl_prog = NULL;
 
 typedef enum
 {
@@ -394,7 +395,7 @@ R_Init_OpenGL
 qboolean R_Init_OpenGL( void )
 {
 	VID_StartupGamma();
-	MsgDev( D_NOTE, "R_Init_OpenGL()\n");
+	MsgDev( D_NOTE, "R_Init_OpenGL()\n" );
 
 	gl_vgl_indices = malloc( sizeof( uint16_t ) * MAX_VGL_ARRAYSIZE );
 	for( uint16_t i = 0; i < MAX_VGL_ARRAYSIZE; ++i ) gl_vgl_indices[i] = i;
@@ -404,11 +405,12 @@ qboolean R_Init_OpenGL( void )
 	gl_vgl_texcoords = calloc( MAX_VGL_ARRAYSIZE * 2, sizeof( GLfloat ) );
 
 	qboolean ret = VID_SetMode();
+	printf( "R_Init_OpenGL(): %dx%d\n", glState.width, glState.height );
 
-	vglInitExtended( 0x800000, glState.width, glState.height, 0x1000000, SCE_GXM_MULTISAMPLE_NONE );
 	vglUseVram( GL_TRUE );
-	vglWaitVblankStart( GL_TRUE );
 	vglUseExtraMem( GL_FALSE );
+	vglInitExtended( 0x10000, glState.width, glState.height, 0x1000000, SCE_GXM_MULTISAMPLE_NONE );
+	vglWaitVblankStart( GL_TRUE );
 
 	vglIndexPointerMapped( gl_vgl_indices );
 
@@ -468,9 +470,22 @@ void pglTexImage2D( GLenum target, GLint level, GLint internalformat, GLsizei wi
 
 static GLuint fs[9];
 static GLuint vs[4];
-static GLuint programs[9];
 
-static qboolean just_color; // HACK
+static vgl_prog_t programs[VGL_SHADER_PROG_COUNT] =
+{
+	// frag                           vert                               pos      texcoord  color
+	{ VGL_SHADER_REPLACE,             VGL_SHADER_TEXTURE2D,            { GL_TRUE, GL_TRUE,  GL_FALSE } },
+	{ VGL_SHADER_MODULATE,            VGL_SHADER_TEXTURE2D,            { GL_TRUE, GL_TRUE,  GL_FALSE } },
+	{ VGL_SHADER_MODULATE_WITH_COLOR, VGL_SHADER_TEXTURE2D_WITH_COLOR, { GL_TRUE, GL_TRUE,  GL_TRUE  } },
+	{ VGL_SHADER_RGBA_COLOR,          VGL_SHADER_COLOR,                { GL_TRUE, GL_FALSE, GL_TRUE  } },
+	{ VGL_SHADER_MONO_COLOR,          VGL_SHADER_VERTEX_ONLY,          { GL_TRUE, GL_FALSE, GL_FALSE } },
+	{ VGL_SHADER_REPLACE_A,           VGL_SHADER_TEXTURE2D,            { GL_TRUE, GL_TRUE,  GL_FALSE } },
+	{ VGL_SHADER_MODULATE_A,          VGL_SHADER_TEXTURE2D,            { GL_TRUE, GL_TRUE,  GL_FALSE } },
+	{ VGL_SHADER_RGBA_A,              VGL_SHADER_COLOR,                { GL_TRUE, GL_FALSE, GL_TRUE  } },
+	{ VGL_SHADER_MODULATE_COLOR_A,    VGL_SHADER_TEXTURE2D_WITH_COLOR, { GL_TRUE, GL_TRUE,  GL_TRUE  } },
+};
+
+static qboolean just_color = true; // HACK
 
 static int state_mask = 0;
 static int texenv_mask = 0;
@@ -484,29 +499,87 @@ GLint u_modcolor[2];
 static qboolean shaders_loaded;
 static qboolean shaders_reload;
 
-static void *LoadShader( const char* filename, GLuint idx, GLboolean fragment )
+static void LoadShader( const char* filename, GLuint idx, GLboolean fragment )
 {
 	FILE* f = fopen( filename, "rb" );
+	if ( !f )
+	{
+		Sys_Error( "LoadShader(%s): could not open file\n", filename );
+		return;
+	}
+
 	fseek( f, 0, SEEK_END );
 	long int size = ftell( f );
 	fseek( f, 0, SEEK_SET );
+
 	void* res = malloc( size );
+	if ( !res )
+	{
+		fclose( f );
+		Sys_Error( "LoadShader(%s): out of memory\n", filename );
+		return;
+	}
+
 	fread( res, 1, size, f );
 	fclose( f );
-	if( fragment ) { fs[idx] = glCreateShader( GL_FRAGMENT_SHADER ); glShaderBinary( 1, &fs[idx], 0, res, size ); }
-	else { vs[idx] = glCreateShader( GL_VERTEX_SHADER ); glShaderBinary( 1, &vs[idx], 0, res, size ); }
+
+	if( fragment )
+	{
+		fs[idx] = glCreateShader( GL_FRAGMENT_SHADER );
+		if ( fs[idx] == 0 )
+		{
+			free( res );
+			Sys_Error( "LoadShader(%s): glCreateShader returned %08x\n", glGetError() );
+			return;
+		}
+		glShaderBinary( 1, &fs[idx], 0, res, size );
+	}
+	else
+	{
+		vs[idx] = glCreateShader( GL_VERTEX_SHADER );
+		if ( vs[idx] == 0 )
+		{
+			free( res );
+			Sys_Error( "LoadShader(%s): glCreateShader returned %08x\n", glGetError() );
+			return;
+		}
+		glShaderBinary( 1, &vs[idx], 0, res, size );
+	}
+
 	free( res );
 }
 
-static inline void LinkShader( GLuint pidx, GLuint fidx, GLuint vidx, GLboolean texcoord, GLboolean color )
+static inline void LinkShader( GLuint pidx )
 {
-	programs[pidx] = glCreateProgram( );
-	glAttachShader( programs[pidx], fs[fidx] );
-	glAttachShader( programs[pidx], vs[vidx] );
-	vglBindAttribLocation( programs[pidx], 0, "aPosition", 3, GL_FLOAT );
-	if( texcoord ) vglBindAttribLocation( programs[pidx], 1, "aTexCoord", 2, GL_FLOAT );
-	if( color ) vglBindAttribLocation( programs[pidx], 2, "aColor", 4, GL_FLOAT );
-	glLinkProgram( programs[pidx] );
+	vgl_prog_t *prog = programs + pidx;
+
+	prog->glprog = glCreateProgram( );
+
+	glAttachShader( prog->glprog, fs[prog->fidx] );
+	glAttachShader( prog->glprog, vs[prog->vidx] );
+
+	GLuint attrn = 0;
+	// position is always used
+	prog->attr_idx[VGL_ATTR_POS] = attrn;
+	vglBindAttribLocation( prog->glprog, attrn++, "aPosition", 3, GL_FLOAT );
+	if( prog->attr_used[VGL_ATTR_TEXCOORD] )
+	{
+		prog->attr_idx[VGL_ATTR_TEXCOORD] = attrn;
+		vglBindAttribLocation( prog->glprog, attrn++, "aTexCoord", 2, GL_FLOAT );
+	}
+	if( prog->attr_used[VGL_ATTR_COLOR] )
+	{
+		prog->attr_idx[VGL_ATTR_COLOR] = attrn;
+		vglBindAttribLocation( prog->glprog, attrn++, "aColor", 4, GL_FLOAT );
+	}
+
+	glLinkProgram( prog->glprog );
+}
+
+static inline void UseProgram( GLuint pidx )
+{
+	gl_vgl_prog = &programs[pidx];
+	glUseProgram( gl_vgl_prog->glprog );
 }
 
 void Vita_FreeShaders( void )
@@ -514,7 +587,7 @@ void Vita_FreeShaders( void )
 	if( shaders_loaded )
 	{
 		for( int i = 0; i < 9; i++ )
-			glDeleteProgram( programs[i] );
+			glDeleteProgram( programs[i].glprog );
 		for( int i = 0; i < 9; i++ )
 			glDeleteShader( fs[i] );
 		for( int i = 0; i < 4; i++ )
@@ -542,19 +615,12 @@ void Vita_ReloadShaders( void )
 	LoadShader( "app0:shaders/rgba_v.gxp", VGL_SHADER_COLOR, GL_FALSE );
 	LoadShader( "app0:shaders/vertex_v.gxp", VGL_SHADER_VERTEX_ONLY, GL_FALSE );
 
-	LinkShader( VGL_SHADER_TEX2D_REPL, VGL_SHADER_REPLACE, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
-	LinkShader( VGL_SHADER_TEX2D_MODUL, VGL_SHADER_MODULATE, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
-	LinkShader( VGL_SHADER_TEX2D_MODUL_CLR, VGL_SHADER_MODULATE_WITH_COLOR, VGL_SHADER_TEXTURE2D_WITH_COLOR, GL_TRUE, GL_TRUE );
-	LinkShader( VGL_SHADER_RGBA_COLOR, VGL_SHADER_RGBA_COLOR, VGL_SHADER_COLOR, GL_FALSE, GL_TRUE );
-	LinkShader( VGL_SHADER_NO_COLOR, VGL_SHADER_MONO_COLOR, VGL_SHADER_VERTEX_ONLY, GL_FALSE, GL_FALSE );
-	LinkShader( VGL_SHADER_TEX2D_REPL_A, VGL_SHADER_REPLACE_A, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
-	LinkShader( VGL_SHADER_TEX2D_MODUL_A, VGL_SHADER_MODULATE_A, VGL_SHADER_TEXTURE2D, GL_TRUE, GL_FALSE );
-	LinkShader( VGL_SHADER_FULL_A, VGL_SHADER_MODULATE_COLOR_A, VGL_SHADER_TEXTURE2D_WITH_COLOR, GL_TRUE, GL_TRUE );
-	LinkShader( VGL_SHADER_RGBA_CLR_A, VGL_SHADER_RGBA_A, VGL_SHADER_COLOR, GL_FALSE, GL_TRUE );
+	for ( GLuint i = 0; i < VGL_SHADER_PROG_COUNT; ++i)
+		LinkShader( i );
 
-	u_modcolor[0] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL], "uColor" );
-	u_modcolor[1] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL_A], "uColor" );
-	u_monocolor = glGetUniformLocation( programs[VGL_SHADER_NO_COLOR], "uColor" );
+	u_modcolor[0] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL].glprog, "uColor" );
+	u_modcolor[1] = glGetUniformLocation( programs[VGL_SHADER_TEX2D_MODUL_A].glprog, "uColor" );
+	u_monocolor = glGetUniformLocation( programs[VGL_SHADER_NO_COLOR].glprog, "uColor" );
 }
 
 void Vita_SetShader( void )
@@ -567,35 +633,35 @@ void Vita_SetShader( void )
 		case 0x08: // Alpha Test
 		case 0x0C: // Alpha Test + Modulate
 			just_color = true;
-			glUseProgram( programs[VGL_SHADER_NO_COLOR] );
+			UseProgram( VGL_SHADER_NO_COLOR );
 			break;
 		case 0x01: // Texcoord
 		case 0x03: // Texcoord + Color
-			glUseProgram( programs[VGL_SHADER_TEX2D_REPL] );
+			UseProgram( VGL_SHADER_TEX2D_REPL );
 			break;
 		case 0x02: // Color
 		case 0x06: // Color + Modulate
-			glUseProgram( programs[VGL_SHADER_RGBA_COLOR] );
+			UseProgram( VGL_SHADER_RGBA_COLOR );
 			break;
 		case 0x05: // Modulate + Texcoord
-			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL] );
+			UseProgram( VGL_SHADER_TEX2D_MODUL );
 			break;
 		case 0x07: // Modulate + Texcoord + Color
-			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL_CLR] );
+			UseProgram( VGL_SHADER_TEX2D_MODUL_CLR );
 			break;
 		case 0x09: // Alpha Test + Texcoord
 		case 0x0B: // Alpha Test + Color + Texcoord
-			glUseProgram( programs[VGL_SHADER_TEX2D_REPL_A] );
+			UseProgram( VGL_SHADER_TEX2D_REPL_A );
 			break;
 		case 0x0A: // Alpha Test + Color
 		case 0x0E: // Alpha Test + Modulate + Color
-			glUseProgram( programs[VGL_SHADER_RGBA_CLR_A] );
+			UseProgram( VGL_SHADER_RGBA_CLR_A );
 			break;
 		case 0x0D: // Alpha Test + Modulate + Texcoord
-			glUseProgram( programs[VGL_SHADER_TEX2D_MODUL_A] );
+			UseProgram( VGL_SHADER_TEX2D_MODUL_A );
 			break;
 		case 0x0F: // Alpha Test + Modulate + Texcoord + Color
-			glUseProgram( programs[VGL_SHADER_FULL_A] );
+			UseProgram( VGL_SHADER_FULL_A );
 			break;
 		default:
 			break;

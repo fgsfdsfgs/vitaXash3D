@@ -2,7 +2,7 @@ void main(
 	float3 aPosition,
 	float2 aTexCoord,
 	float4 aColor,
-	column_major uniform float4x4 wvp,
+	uniform float4x4 wvp,
 	float4 out vPosition : POSITION,
 	float2 out vTexCoord : TEXCOORD0,
 	float4 out vColor : COLOR)

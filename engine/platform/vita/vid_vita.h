@@ -33,11 +33,30 @@
 #define VGL_SHADER_TEX2D_MODUL_A        6
 #define VGL_SHADER_RGBA_CLR_A           7
 #define VGL_SHADER_FULL_A               8
+#define VGL_SHADER_PROG_COUNT           9
+
+typedef enum
+{
+	VGL_ATTR_POS,
+	VGL_ATTR_TEXCOORD,
+	VGL_ATTR_COLOR,
+	VGL_ATTR_MAX
+} vgl_attrib_t;
+
+typedef struct
+{
+	GLuint fidx;
+	GLuint vidx;
+	GLboolean attr_used[VGL_ATTR_MAX];
+	GLuint attr_idx[VGL_ATTR_MAX];
+	GLuint glprog;
+} vgl_prog_t;
 
 extern float *gl_vgl_verts;
 extern float *gl_vgl_texcoords;
 extern float *gl_vgl_colors;
 extern uint16_t *gl_vgl_indices;
+extern vgl_prog_t *gl_vgl_prog;
 
 void Vita_BeginFrame( void );
 void Vita_EndFrame( void );
@@ -49,17 +68,17 @@ void Vita_FreeShaders( void );
 
 static inline void Vita_VertexPointer( int count, GLenum type, int stride, int num, void *ptr )
 {
-	vglVertexAttribPointer( 0, count, type, GL_FALSE, 0, num, ptr );
+	vglVertexAttribPointer( gl_vgl_prog->attr_idx[VGL_ATTR_POS], count, type, GL_FALSE, 0, num, ptr );
 }
 
 static inline void Vita_TexCoordPointer( int count, GLenum type, int stride, int num, void *ptr )
 {
-	vglVertexAttribPointer( 1, count, type, GL_FALSE, 0, num, ptr );
+	vglVertexAttribPointer( gl_vgl_prog->attr_idx[VGL_ATTR_TEXCOORD], count, type, GL_FALSE, 0, num, ptr );
 }
 
 static inline void Vita_ColorPointer( int count, GLenum type, int stride, int num, void *ptr )
 {
-	vglVertexAttribPointer( 2, count, type, GL_FALSE, 0, num, ptr );
+	vglVertexAttribPointer( gl_vgl_prog->attr_idx[VGL_ATTR_COLOR], count, type, GL_FALSE, 0, num, ptr );
 }
 
 
