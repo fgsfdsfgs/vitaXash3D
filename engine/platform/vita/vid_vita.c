@@ -409,7 +409,7 @@ qboolean R_Init_OpenGL( void )
 
 	vglUseVram( GL_TRUE );
 	vglUseExtraMem( GL_FALSE );
-	vglInitExtended( 0x10000, glState.width, glState.height, 0x1000000, SCE_GXM_MULTISAMPLE_NONE );
+	vglInitExtended( 0x800000, glState.width, glState.height, 0x1000000, SCE_GXM_MULTISAMPLE_NONE );
 	vglWaitVblankStart( GL_TRUE );
 
 	vglIndexPointerMapped( gl_vgl_indices );
@@ -493,6 +493,7 @@ static int texcoord_state = 0;
 static int alpha_state = 0;
 static int color_state = 0;
 static float cur_color[4];
+static qboolean cur_color_changed = true;
 GLint u_monocolor;
 GLint u_modcolor[2];
 
@@ -736,9 +737,13 @@ void Vita_DisableGLState( int state )
 
 void Vita_DrawGLPoly( GLenum prim, int num, GLboolean implicit_wvp )
 {
-	if( (state_mask + texenv_mask) == 0x05 ) glUniform4fv( u_modcolor[0], 1, cur_color );
-	else if( (state_mask + texenv_mask) == 0x0D ) glUniform4fv( u_modcolor[1], 1, cur_color );
-	else if( just_color ) glUniform4fv( u_monocolor, 1, cur_color );
+	if( cur_color_changed )
+	{
+		if( (state_mask + texenv_mask) == 0x05 ) glUniform4fv( u_modcolor[0], 1, cur_color );
+		else if( (state_mask + texenv_mask) == 0x0D ) glUniform4fv( u_modcolor[1], 1, cur_color );
+		else if( just_color ) glUniform4fv( u_monocolor, 1, cur_color );
+		cur_color_changed = false;
+	}
 	vglDrawObjects( prim, num, implicit_wvp );
 }
 
@@ -750,6 +755,7 @@ void pglColor3f( float r, float g, float b )
 	cur_color[1] = g;
 	cur_color[2] = b;
 	cur_color[3] = 1.f;
+	cur_color_changed = true;
 }
 
 void pglColor4f( float r, float g, float b, float a )
@@ -758,6 +764,7 @@ void pglColor4f( float r, float g, float b, float a )
 	cur_color[1] = g;
 	cur_color[2] = b;
 	cur_color[3] = a;
+	cur_color_changed = true;
 }
 
 void pglColor4ub( uint8_t r, uint8_t g, uint8_t b, uint8_t a )
@@ -766,6 +773,7 @@ void pglColor4ub( uint8_t r, uint8_t g, uint8_t b, uint8_t a )
 	cur_color[1] = g / 255.f;
 	cur_color[2] = b / 255.f;
 	cur_color[3] = a / 255.f;
+	cur_color_changed = true;
 }
 
 void pglColor4ubv( uint8_t *v )
@@ -774,6 +782,7 @@ void pglColor4ubv( uint8_t *v )
 	cur_color[1] = *(v++) / 255.f;
 	cur_color[2] = *(v++) / 255.f;
 	cur_color[3] = *(v  ) / 255.f;
+	cur_color_changed = true;
 }
 
 void pglTexEnvi( GLenum target, GLenum pname, GLint param )

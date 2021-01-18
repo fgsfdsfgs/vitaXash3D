@@ -3,6 +3,6 @@ void main(
 	uniform float4x4 wvp,
 	float4 out vPosition : POSITION)
 {
-	vPosition = mul(float4(aPosition, 1.f), wvp);
+	vPosition = mul(wvp, float4(aPosition, 1.f));
 }
 

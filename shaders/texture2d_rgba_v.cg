@@ -7,7 +7,7 @@ void main(
 	float2 out vTexCoord : TEXCOORD0,
 	float4 out vColor : COLOR)
 {
-	vPosition = mul(float4(aPosition, 1.f), wvp);
+	vPosition = mul(wvp, float4(aPosition, 1.f));
 	vTexCoord = aTexCoord;
 	vColor = aColor;
 }
