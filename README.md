@@ -1,6 +1,11 @@
 # vitaXash3D
 A port of Xash3D-FWGS to the PSVita.
 
+## Note
+This is a port of an older version of the engine, v0.19. PSVita support has now been merged into mainline Xash3d-FWGS,
+so if you don't have a specific reason to be using this version you [should probably use the new one](https://github.com/FWGS/xash3d-fwgs/blob/master/Documentation/psvita.md).
+This port will no longer be updated.
+
 ## Warning
 This port is still a work in progress. Expect graphics and sound glitches, crashes and gameplay oddities.
 
